@@ -18,6 +18,10 @@
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
+            background-image: url('img/teste2.gif');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
             }
             .login-container {
             background: white;
@@ -86,17 +90,15 @@
     </head>
     <body>
         <div class="login-container" role="main">
-            <h2>Entrar</h2>
+            <h2>Que bom te ver de volta!</h2>
             <form id="loginForm" novalidate>
                 <label for="email">E-mail</label>
                 <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="username" />
                 <label for="password">Senha</label>
                 <input type="password" id="password" name="password" placeholder="Digite sua senha" required autocomplete="current-password" />
-                <label for="password">Repita senha</label>
-                <input type="password" id="password" name="password1" placeholder="Digite sua senha" required autocomplete="current-password" />
-                <button type="submit" href="Home.html">cadastro</button>
+                <button type="submit">Login</button>
             </form>
-            <p class="footer-text">Já tem uma conta? <a href="login.html" style="color:#2575fc; text-decoration:none;">log in</a></p>
+            <p class="footer-text">Não tem uma conta? <a href="cadastro.html" style="color:#2575fc; text-decoration:none;">Cadastre-se</a></p>
         </div>
         <script>
             // Simple client-side validation and submit handler
@@ -114,4 +116,3 @@
         </script>
     </body>
 </html>
-
