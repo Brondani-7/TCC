@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum Bonfire Games - Posts e Discussões</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            background: url('IMG/forum.gif') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .top-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+
+
+        .header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .header nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        .header nav ul li {
+            margin-left: 20px;
+        }
+
+        .header nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .header nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Post Styles */
+        .post {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-user {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .post-time {
+            margin-left: 10px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+        }
+
+        .post-media img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .post-media video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .post-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .post-link:hover {
+            text-decoration: underline;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #495057;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .upvote-btn, .comments-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .upvote-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .comments-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .upvote-count {
+            margin-right: 5px;
+        }
+
+        .upvote-count, .comments-count {
+            font-weight: bold;
+        }
+
+        /* Comments */
+        .comments-section {
+            display: none;
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 2px solid #dee2e6;
+        }
+
+        .comment {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .comment-user {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 0.9rem;
+        }
+
+        .comment-time {
+            margin-left: 10px;
+            color: #777;
+            font-size: 0.8rem;
+        }
+
+        .add-comment {
+            margin-top: 10px;
+        }
+
+        .add-comment textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .add-comment button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-comment button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Create Post */
+        .create-post {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .create-post h2 {
+            margin-bottom: 10px;
+        }
+
+        .create-post textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .create-post input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .create-post button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .create-post button:hover {
+            background-color: #1e7e34;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header nav ul {
+                margin-top: 10px;
+            }
+            .header nav ul li {
+                margin-left: 15px;
+                margin-right: 10px;
+            }
+            .post-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+    <script>
+        // Function to toggle comments visibility
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById('comments-' + postId);
+            if (commentsSection.style.display === 'none' || commentsSection.style.display === '') {
+                commentsSection.style.display = 'block';
+            } else {
+                commentsSection.style.display = 'none';
+            }
+        }
+
+        // Simulate upvote
+        let upvoteCounts = { /* initial counts */ };
+        function upvote(postId) {
+            if (!upvoteCounts[postId]) upvoteCounts[postId] = 0;
+            upvoteCounts[postId]++;
+            document.querySelector(`#post-${postId} .upvote-count`).innerText = upvoteCounts[postId];
+        }
+
+        // Add comment (simulate)
+        function addComment(postId) {
+            const textarea = document.querySelector(`#add-comment-${postId} textarea`);
+            const text = textarea.value.trim();
+            if (text) {
+                const commentsDiv = document.getElementById('comments-' + postId);
+                const newComment = document.createElement('div');
+                newComment.className = 'comment';
+                newComment.innerHTML = `
+                    <div class="comment-user">Você <span class="comment-time">${new Date().toLocaleTimeString()}</span></div>
+                    <p>${text}</p>
+                `;
+                commentsDiv.appendChild(newComment);
+                textarea.value = '';
+            }
+        }
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="top-menu">
+        <div class="menu-logo">BONFIRE GAMES</div>
+        <nav class="menu-nav">
+            <ul>
+                <li><a href="#">Firelink</a></li>
+                <li><a href="#">Fansgames</a></li>
+                <li><a href="#">Bonfires</a></li>
+                <li><a href="#">Sobre</a></li>
+            </ul>
+        </nav>
+    </div>
+    </header>
+
+    <div class="main-container" id="posts">
+        <div class="create-post">
+            <h2>Criar Novo Post</h2>
+            <form onsubmit="event.preventDefault(); /* Handle form submission */">
+                <input type="text" placeholder="Título do Post" required />
+                <textarea placeholder="Conteúdo do Post..." rows="4" required></textarea>
+                <input type="text" placeholder="Tags (separadas por vírgula, com # ex: #fanart, #game)" />
+                <input type="url" placeholder="Link para jogo ou mídia (opcional)" />
+                <button type="submit">Postar</button>
+            </form>
+        </div>
+
+        <!-- Post 1: Fanart -->
+        <div class="post" id="post-1">
+            <div class="post-header">
+                <span class="post-user">ArtistaCR</span>
+                <span class="post-time">2 horas atrás</span>
+            </div>
+            <div class="post-content">
+                <p>Incrível fanart do protagonista de nosso último jogo! O que vocês acham?</p>
+                <div class="post-media">
+                    <img src="https://placehold.co/800x600" alt="Detailed fanart illustration of a heroic fantasy warrior standing on a cliff overlooking a mystical forest at sunset with glowing sword and magical energy swirling around, vibrant colors of orange and blue, high-resolution digital art style" />
+                </div>
+            </div>
+            <div class="post-tags">
+                <span class="tag">#fanart</span>
+                <span class="tag">#gameart</span>
+            </div>
+            <div class="post-actions">
+                <button class="upvote-btn" onclick="upvote(1)">
+                    <span class="upvote-count">15</span> Upvote
+                </button>
+                <button class="comments-btn" onclick="toggleComments(1)">
+                    <span class="comments-count">5</span> Comentários
+                </button>
+            </div>
+            <div class="comments-section" id="comments-1" style="display: none;">
+                <div class="comment">
+                    <div class="comment-user">GamerFan <span class="comment-time">1 hora atrás</span></div>
+                    <p>Essa arte é épica! Amando os detalhes.</p>
+                </div>
+                <div class="comment">
+                    <div class="comment-user">ArtistLover <span class="comment-time">50 minutos atrás</span></div>
+                    <p>Obrigado! Usei inspiração em jogos indie.</p>
+                </div>
+                <div id="add-comment-1" class="add-comment">
+                    <textarea placeholder="Adicione seu comentário..."></textarea>
+                    <button onclick="addComment(1)">Comentar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post 2: Video -->
+        <div class="post" id="post-2">
+            <div class="post-header">
+                <span class="post-user">StreamerPro</span>
+                <span class="post-time">4 horas atrás</span>
+            </div>
+            <div class="post-content">
+                <p>Review completo do novo jogo da Bonfire! Veja o vídeo:</p>
+                <div class="post-media">
+                    <video controls>
+                        <source src="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4" type="video/mp4">
+                        Seu navegador não suporta o elemento vídeo.
+                    </video>
+                </div>
+            </div>
+            <div class="post-tags">
+                <span class="tag">#video</span>
+                <span class="tag">#review</span>
+                <span class="tag">#gameplay</span>
+            </div>
+            <div class="post-actions">
+                <button class="upvote-btn" onclick="upvote(2)">
+                    <span class="upvote-count">22</span> Upvote
+                </button>
+                <button class="comments-btn" onclick="toggleComments(2)">
+                    <span class="comments-count">8</span> Comentários
+                </button>
+            </div>
+            <div class="comments-section" id="comments-2" style="display: none;">
+                <div class="comment">
+                    <div class="comment-user">ReviewFan <span class="comment-time">3 horas atrás</span></div>
+                    <p>Ótima análise! Esperei muito por esse jogo.</p>
+                </div>
+                <div id="add-comment-2" class="add-comment">
+                    <textarea placeholder="Adicione seu comentário..."></textarea>
+                    <button onclick="addComment(2)">Comentar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post 3: Link de Jogos -->
+        <div class="post" id="post-3">
+            <div class="post-header">
+                <span class="post-user">LinkSharer</span>
+                <span class="post-time">6 horas atrás</span>
+            </div>
+            <div class="post-content">
+                <p>Baixe o último trailer do nosso próximo RPG! <a class="post-link" href="https://dummy.com/trailer">Veja aqui</a></p>
+            </div>
+            <div class="post-tags">
+                <span class="tag">#link</span>
+                <span class="tag">#game</span>
+                <span class="tag">#trailer</span>
+            </div>
+            <div class="post-actions">
+                <button class="upvote-btn" onclick="upvote(3)">
+                    <span class="upvote-count">10</span> Upvote
+                </button>
+                <button class="comments-btn" onclick="toggleComments(3)">
+                    <span class="comments-count">3</span> Comentários
+                </button>
+            </div>
+            <div class="comments-section" id="comments-3" style="display: none;">
+                <div class="comment">
+                    <div class="comment-user">GamingNerd <span class="comment-time">5 horas atrás</span></div>
+                    <p>Parece incrível! Mal posso esperar.</p>
+                </div>
+                <div id="add-comment-3" class="add-comment">
+                    <textarea placeholder="Adicione seu comentário..."></textarea>
+                    <button onclick="addComment(3)">Comentar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+</content>
+</create_file>
