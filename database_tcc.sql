@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 14/08/2025 às 16:41
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.0.30
+-- Tempo de geração: 11-Set-2025 às 16:45
+-- Versão do servidor: 10.4.27-MariaDB
+-- versão do PHP: 8.1.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,12 +24,25 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `fóruns`
+-- Estrutura da tabela `comentarios`
+--
+
+CREATE TABLE `comentarios` (
+  `commentID` int(11) NOT NULL,
+  `UserID` int(11) NOT NULL,
+  `text` varchar(255) NOT NULL,
+  `date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `fóruns`
 --
 
 CREATE TABLE `fóruns` (
   `ForumID` int(11) UNSIGNED NOT NULL,
-  `ForumName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `ForumName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `CustomerID` int(11) NOT NULL,
   `PostID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -37,27 +50,30 @@ CREATE TABLE `fóruns` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `posts`
+-- Estrutura da tabela `posts`
 --
 
 CREATE TABLE `posts` (
   `PostID` int(11) UNSIGNED NOT NULL,
-  `CustomerID` int(11) UNSIGNED NOT NULL,
-  `Data` datetime DEFAULT NULL,
-  `PostMessage` text DEFAULT NULL
+  `UserID` int(11) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `content` varchar(255) NOT NULL,
+  `tags` varchar(255) NOT NULL,
+  `likes` int(11) NOT NULL,
+  `dislikes` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `usuários`
+-- Estrutura da tabela `usuários`
 --
 
 CREATE TABLE `usuários` (
   `CustomerID` int(11) UNSIGNED NOT NULL,
-  `CustomerGmail` varchar(255) NOT NULL,
-  `CustomerName` varchar(255) NOT NULL,
-  `CustomerPassword` varchar(255) NOT NULL
+  `Email` varchar(255) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `Password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -65,26 +81,38 @@ CREATE TABLE `usuários` (
 --
 
 --
--- Índices de tabela `fóruns`
+-- Índices para tabela `comentarios`
+--
+ALTER TABLE `comentarios`
+  ADD PRIMARY KEY (`commentID`);
+
+--
+-- Índices para tabela `fóruns`
 --
 ALTER TABLE `fóruns`
   ADD PRIMARY KEY (`ForumID`);
 
 --
--- Índices de tabela `posts`
+-- Índices para tabela `posts`
 --
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`PostID`);
 
 --
--- Índices de tabela `usuários`
+-- Índices para tabela `usuários`
 --
 ALTER TABLE `usuários`
   ADD PRIMARY KEY (`CustomerID`);
 
 --
--- AUTO_INCREMENT para tabelas despejadas
+-- AUTO_INCREMENT de tabelas despejadas
 --
+
+--
+-- AUTO_INCREMENT de tabela `comentarios`
+--
+ALTER TABLE `comentarios`
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `fóruns`
