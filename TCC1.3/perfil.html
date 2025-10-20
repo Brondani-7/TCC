@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Perfil</title>
+  <style>
+    :root {
+      --branco-fundo: #ffffff;
+      --cinza-claro: #f4f4f4;
+      --azul-neon: #1e90ff; /* tom mais suave */
+      --texto-escuro: #111;
+      --sombra-neon: 0 0 6px var(--azul-neon); /* brilho mais fraco */
+    }
+
+    body {
+      background-color: var(--branco-fundo);
+      color: var(--texto-escuro);
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===== CABEÇALHO ===== */
+    header {
+      background-color: var(--branco-fundo);
+      color: var(--azul-neon);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 25px;
+      border-bottom: 2px solid var(--azul-neon);
+      box-shadow: var(--sombra-neon);
+      border-radius: 0 0 20px 20px;
+    }
+
+    header h2 {
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* ===== ÍCONE DE LUPA ===== */
+    .lupa {
+      cursor: pointer;
+      transition: 0.3s;
+      width: 26px;
+      height: 26px;
+      stroke: var(--azul-neon);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .lupa:hover {
+      stroke: #005ecb;
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 5px var(--azul-neon));
+    }
+
+    /* ===== PERFIL ===== */
+    .perfil-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .imagem-principal {
+      width: 90%;
+      height: 250px;
+      background-color: var(--cinza-claro);
+      border: 2px solid var(--azul-neon);
+      border-radius: 25px;
+      box-shadow: var(--sombra-neon);
+      margin-bottom: 25px;
+    }
+
+    .info-perfil {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .foto-perfil {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 3px solid var(--azul-neon);
+      background-color: var(--cinza-claro);
+      box-shadow: var(--sombra-neon);
+    }
+
+    .descricao-perfil {
+      background-color: var(--branco-fundo);
+      border: 2px solid var(--azul-neon);
+      border-radius: 20px;
+      padding: 15px 25px;
+      width: 420px;
+      text-align: center;
+      box-shadow: var(--sombra-neon);
+    }
+
+    /* ===== POSTS ===== */
+    .posts-container {
+      width: 90%;
+      background-color: var(--branco-fundo);
+      border: 2px solid var(--azul-neon);
+      border-radius: 20px;
+      box-shadow: var(--sombra-neon);
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .post {
+      background-color: var(--cinza-claro);
+      border: 2px solid var(--azul-neon);
+      border-radius: 20px;
+      box-shadow: var(--sombra-neon);
+      padding: 20px;
+      transition: 0.3s;
+    }
+
+    .post:hover {
+      transform: scale(1.01);
+      box-shadow: 0 0 10px var(--azul-neon);
+    }
+
+    .post img {
+      width: 100%;
+      height: 220px;
+      border-radius: 15px;
+      background-color: #eaeaea;
+      border: 1px solid var(--azul-neon);
+      box-shadow: var(--sombra-neon);
+      margin-bottom: 15px;
+    }
+
+    .post h3 {
+      color: var(--azul-neon);
+      margin-bottom: 8px;
+    }
+
+    .post p {
+      color: var(--texto-escuro);
+      font-size: 14px;
+    }
+
+    .hashtags {
+      margin-top: 10px;
+      color: var(--azul-neon);
+      font-size: 13px;
+    }
+
+    /* ===== ÍCONES CONTORNADOS ===== */
+    .curtidas {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--texto-escuro);
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      stroke: var(--texto-escuro);
+      fill: none;
+      stroke-width: 2;
+      vertical-align: middle;
+    }
+
+    .curtidas span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ===== RODAPÉ ===== */
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      padding: 10px;
+      color: var(--texto-escuro);
+      border-top: 1px solid var(--azul-neon);
+      box-shadow: var(--sombra-neon);
+      border-radius: 20px 20px 0 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>PERFIL</h2>
+    <a href="pesquisa.html" title="Ir para pesquisa">
+      <svg class="lupa" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="16.65" y1="16.65" x2="21" y2="21" />
+      </svg>
+    </a>
+  </header>
+
+  <div class="perfil-container">
+    <div class="imagem-principal"></div>
+
+    <div class="info-perfil">
+      <div class="foto-perfil"></div>
+      <div class="descricao-perfil">
+        <p><strong>@usuario</strong></p>
+        <p>Descrição do perfil e informações básicas.</p>
+      </div>
+    </div>
+
+    <div class="posts-container">
+      <div class="post">
+        <img src="#" alt="Imagem do post">
+        <h3>Título do Post</h3>
+        <p>Descrição breve do post, informações e conteúdo.</p>
+        <p class="hashtags">#exemplo #perfil #jogos</p>
+
+        <div class="curtidas">
+          <span>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M14 9V5a3 3 0 0 0-6 0v4H3v12h18V9h-7z"/>
+            </svg>
+            10 curtidas
+          </span>
+          <span>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M10 15v4a3 3 0 0 0 6 0v-4h5V3H3v12h7z"/>
+            </svg>
+            2 dislikes
+          </span>
+        </div>
+      </div>
+
+      <div class="post">
+        <img src="#" alt="Imagem do post">
+        <h3>Outro Post</h3>
+        <p>Conteúdo do segundo post...</p>
+        <p class="hashtags">#tag1 #tag2</p>
+
+        <div class="curtidas">
+          <span>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M14 9V5a3 3 0 0 0-6 0v4H3v12h18V9h-7z"/>
+            </svg>
+            5 curtidas
+          </span>
+          <span>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M10 15v4a3 3 0 0 0 6 0v-4h5V3H3v12h7z"/>
+            </svg>
+            1 dislike
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 - Fórum Azul & Branco Neon
+  </footer>
+
+</body>
+</html>
