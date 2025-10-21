@@ -1,10 +1,10 @@
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil - Pírola de Açaí</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -45,18 +45,27 @@
             align-items: center;
         }
         
-        .back-arrow {
-            margin-right: 25px;
-            font-size: 24px;
-            color: #1e3c72;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
         .posts-count {
             font-size: 22px;
             font-weight: bold;
             color: #1e3c72;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-icon {
+            font-size: 20px;
+            color: #1e3c72;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-icon:hover {
+            color: #2a5298;
+            transform: scale(1.1);
         }
         
         .profile-container {
@@ -136,18 +145,18 @@
             margin-bottom: 20px;
             line-height: 1.5;
             color: #444;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 4px solid #1e3c72;
+            padding: 0;
+            border-radius: 0;
+            border-left: none;
+            background: transparent;
         }
         
         .stats {
             display: flex;
             margin-bottom: 20px;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
         }
         
         .stat {
@@ -309,8 +318,10 @@
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <div class="back-arrow">←</div>
                 <div class="posts-count">1.234 Posts</div>
+            </div>
+            <div class="header-right">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
             </div>
         </div>
         
@@ -345,10 +356,9 @@
                 <div class="tabs">
                     <div class="tab active">Posts</div>
                     <div class="tab">Respostas</div>
-                    <div class="tab">Destaques</div>
-                    <div class="tab">Artigos</div>
                     <div class="tab">Mídia</div>
                     <div class="tab">Curtidas</div>
+                    <div class="tab">Criações</div>
                 </div>
             </div>
             
