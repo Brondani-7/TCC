@@ -1,268 +1,266 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página de Perfil</title>
-  <style>
-    :root {
-      --branco-fundo: #ffffff;
-      --cinza-claro: #f4f4f4;
-      --azul-neon: #1e90ff; /* tom mais suave */
-      --texto-escuro: #111;
-      --sombra-neon: 0 0 6px var(--azul-neon); /* brilho mais fraco */
-    }
-
-    body {
-      background-color: var(--branco-fundo);
-      color: var(--texto-escuro);
-      font-family: "Segoe UI", Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* ===== CABEÇALHO ===== */
-    header {
-      background-color: var(--branco-fundo);
-      color: var(--azul-neon);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 25px;
-      border-bottom: 2px solid var(--azul-neon);
-      box-shadow: var(--sombra-neon);
-      border-radius: 0 0 20px 20px;
-    }
-
-    header h2 {
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    /* ===== ÍCONE DE LUPA ===== */
-    .lupa {
-      cursor: pointer;
-      transition: 0.3s;
-      width: 26px;
-      height: 26px;
-      stroke: var(--azul-neon);
-      fill: none;
-      stroke-width: 2;
-    }
-
-    .lupa:hover {
-      stroke: #005ecb;
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 5px var(--azul-neon));
-    }
-
-    /* ===== PERFIL ===== */
-    .perfil-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px;
-    }
-
-    .imagem-principal {
-      width: 90%;
-      height: 250px;
-      background-color: var(--cinza-claro);
-      border: 2px solid var(--azul-neon);
-      border-radius: 25px;
-      box-shadow: var(--sombra-neon);
-      margin-bottom: 25px;
-    }
-
-    .info-perfil {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      margin-bottom: 25px;
-    }
-
-    .foto-perfil {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      border: 3px solid var(--azul-neon);
-      background-color: var(--cinza-claro);
-      box-shadow: var(--sombra-neon);
-    }
-
-    .descricao-perfil {
-      background-color: var(--branco-fundo);
-      border: 2px solid var(--azul-neon);
-      border-radius: 20px;
-      padding: 15px 25px;
-      width: 420px;
-      text-align: center;
-      box-shadow: var(--sombra-neon);
-    }
-
-    /* ===== POSTS ===== */
-    .posts-container {
-      width: 90%;
-      background-color: var(--branco-fundo);
-      border: 2px solid var(--azul-neon);
-      border-radius: 20px;
-      box-shadow: var(--sombra-neon);
-      padding: 25px;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
-
-    .post {
-      background-color: var(--cinza-claro);
-      border: 2px solid var(--azul-neon);
-      border-radius: 20px;
-      box-shadow: var(--sombra-neon);
-      padding: 20px;
-      transition: 0.3s;
-    }
-
-    .post:hover {
-      transform: scale(1.01);
-      box-shadow: 0 0 10px var(--azul-neon);
-    }
-
-    .post img {
-      width: 100%;
-      height: 220px;
-      border-radius: 15px;
-      background-color: #eaeaea;
-      border: 1px solid var(--azul-neon);
-      box-shadow: var(--sombra-neon);
-      margin-bottom: 15px;
-    }
-
-    .post h3 {
-      color: var(--azul-neon);
-      margin-bottom: 8px;
-    }
-
-    .post p {
-      color: var(--texto-escuro);
-      font-size: 14px;
-    }
-
-    .hashtags {
-      margin-top: 10px;
-      color: var(--azul-neon);
-      font-size: 13px;
-    }
-
-    /* ===== ÍCONES CONTORNADOS ===== */
-    .curtidas {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--texto-escuro);
-    }
-
-    .icon {
-      width: 18px;
-      height: 18px;
-      stroke: var(--texto-escuro);
-      fill: none;
-      stroke-width: 2;
-      vertical-align: middle;
-    }
-
-    .curtidas span {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    /* ===== RODAPÉ ===== */
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      padding: 10px;
-      color: var(--texto-escuro);
-      border-top: 1px solid var(--azul-neon);
-      box-shadow: var(--sombra-neon);
-      border-radius: 20px 20px 0 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piroka de Açaí - Perfil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 150, 0.1);
+            margin: 10px;
+        }
+        
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e6f2ff;
+            margin-bottom: 20px;
+        }
+        
+        .profile-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #4d94ff;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        .profile-details h1 {
+            font-size: 24px;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+        
+        .profile-details p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .edit-profile-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .profile-bio {
+            background-color: #e6f2ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .profile-bio h2 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .private-section {
+            background-color: #e6f2ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .private-section h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .impressions {
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e6f2ff;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            color: #0066cc;
+            border-bottom: 3px solid #0066cc;
+        }
+        
+        .pinned-post {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #0066cc;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4d94ff;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .post-info {
+            flex-grow: 1;
+        }
+        
+        .post-author {
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .post-date {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .post-content {
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .post-response {
+            color: #0066cc;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
-
-  <header>
-    <h2>PERFIL</h2>
-    <a href="pesquisa.html" title="Ir para pesquisa">
-      <svg class="lupa" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="7" />
-        <line x1="16.65" y1="16.65" x2="21" y2="21" />
-      </svg>
-    </a>
-  </header>
-
-  <div class="perfil-container">
-    <div class="imagem-principal"></div>
-
-    <div class="info-perfil">
-      <div class="foto-perfil"></div>
-      <div class="descricao-perfil">
-        <p><strong>@usuario</strong></p>
-        <p>Descrição do perfil e informações básicas.</p>
-      </div>
-    </div>
-
-    <div class="posts-container">
-      <div class="post">
-        <img src="#" alt="Imagem do post">
-        <h3>Título do Post</h3>
-        <p>Descrição breve do post, informações e conteúdo.</p>
-        <p class="hashtags">#exemplo #perfil #jogos</p>
-
-        <div class="curtidas">
-          <span>
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M14 9V5a3 3 0 0 0-6 0v4H3v12h18V9h-7z"/>
-            </svg>
-            10 curtidas
-          </span>
-          <span>
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M10 15v4a3 3 0 0 0 6 0v-4h5V3H3v12h7z"/>
-            </svg>
-            2 dislikes
-          </span>
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-pic">P</div>
+                <div class="profile-details">
+                    <h1>piroka de açaí</h1>
+                    <p>1.644 posts</p>
+                    <button class="edit-profile-btn">Editor perfil</button>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div class="post">
-        <img src="#" alt="Imagem do post">
-        <h3>Outro Post</h3>
-        <p>Conteúdo do segundo post...</p>
-        <p class="hashtags">#tag1 #tag2</p>
-
-        <div class="curtidas">
-          <span>
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M14 9V5a3 3 0 0 0-6 0v4H3v12h18V9h-7z"/>
-            </svg>
-            5 curtidas
-          </span>
-          <span>
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M10 15v4a3 3 0 0 0 6 0v-4h5V3H3v12h7z"/>
-            </svg>
-            1 dislike
-          </span>
+        
+        <div class="profile-bio">
+            <h2>piroka de açaí</h2>
+            <p>@aegoeasgsa_</p>
+            <p>roblox e strogonoff 🌤</p>
+            <p>💬 casa das primas 💬 Nascido(a) em 8 de janeiro de 2008</p>
+            <p>💭 Ingressou em julho de 2023</p>
         </div>
-      </div>
+        
+        <div class="profile-stats">
+            <div class="stat">
+                <div class="stat-number">38</div>
+                <div class="stat-label">Seguindo</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">17</div>
+                <div class="stat-label">Seguidores</div>
+            </div>
+        </div>
+        
+        <div class="private-section">
+            <h3>Privado</h3>
+            <p class="impressions">3.2K impressões no seu post nos últimos 7 dias</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active">Posts</div>
+            <div class="tab">Respostas</div>
+            <div class="tab">Destaques</div>
+            <div class="tab">Artigos</div>
+            <div class="tab">Mídia</div>
+            <div class="tab">Curtidas</div>
+        </div>
+        
+        <div class="pinned-post">
+            <div class="post-header">
+                <div class="post-avatar">P</div>
+                <div class="post-info">
+                    <div class="post-author">piroka de açaí</div>
+                    <div class="post-date">@aegoeasgsa_ · 17 de out</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Em resposta a <span class="post-response">@_dominatriz_</span>
+                <p>Parabéns amg, mas bebe muito e nem é do ano</p>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <footer>
-    © 2025 - Fórum Azul & Branco Neon
-  </footer>
-
 </body>
 </html>
