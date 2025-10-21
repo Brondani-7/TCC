@@ -1,161 +1,229 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+
+    <!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piroka de Açaí - Perfil</title>
+    <title>Perfil - Pírola de Açaí</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
         
         body {
-            background-color: #f0f8ff;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: #333;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden;
         }
         
         .container {
+            width: 100%;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            padding: 20px;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(0, 0, 150, 0.1);
-            margin: 10px;
+            background: white;
+            border-radius: 0;
         }
         
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e6f2ff;
-            margin-bottom: 20px;
-        }
-        
-        .profile-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .profile-pic {
-            width: 80px;
+        .header {
+            background: white;
             height: 80px;
-            border-radius: 50%;
-            background-color: #4d94ff;
-            margin-right: 20px;
+            padding: 0 30px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            justify-content: space-between;
+            border-bottom: 2px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .back-arrow {
+            margin-right: 25px;
             font-size: 24px;
-        }
-        
-        .profile-details h1 {
-            font-size: 24px;
-            color: #0066cc;
-            margin-bottom: 5px;
-        }
-        
-        .profile-details p {
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .edit-profile-btn {
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            color: #1e3c72;
             cursor: pointer;
             font-weight: bold;
         }
         
-        .profile-bio {
-            background-color: #e6f2ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+        .posts-count {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e3c72;
         }
         
-        .profile-bio h2 {
-            color: #0066cc;
-            margin-bottom: 10px;
+        .profile-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
         }
         
-        .profile-stats {
+        .cover {
+            height: 250px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            position: relative;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            background-color: #e0e0e0;
+            position: absolute;
+            bottom: -75px;
+            left: 40px;
+            overflow: hidden;
             display: flex;
-            justify-content: space-around;
-            background-color: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            color: #1e3c72;
+            font-size: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .profile-info {
+            padding: 90px 40px 20px;
+            background: white;
+        }
+        
+        .profile-actions {
+            display: flex;
+            justify-content: flex-end;
             margin-bottom: 20px;
+        }
+        
+        .edit-profile {
+            border: none;
+            color: white;
+            background: #1e3c72;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
+        }
+        
+        .edit-profile:hover {
+            background: #2a5298;
+            transform: translateY(-2px);
+        }
+        
+        .username {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1e3c72;
+        }
+        
+        .handle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .bio {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #444;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #1e3c72;
+        }
+        
+        .stats {
+            display: flex;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
         }
         
         .stat {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0066cc;
-        }
-        
-        .stat-label {
-            font-size: 14px;
+            margin-right: 30px;
             color: #666;
+            font-size: 15px;
         }
         
-        .private-section {
-            background-color: #e6f2ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .private-section h3 {
-            color: #0066cc;
-            margin-bottom: 10px;
-        }
-        
-        .impressions {
+        .stat span {
+            color: #1e3c72;
             font-weight: bold;
-            color: #0066cc;
+            font-size: 18px;
+        }
+        
+        .tabs-container {
+            background: white;
+            padding: 0 40px;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         .tabs {
             display: flex;
-            border-bottom: 2px solid #e6f2ff;
-            margin-bottom: 20px;
+            height: 60px;
         }
         
         .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            color: #666;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
             font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab:hover {
+            color: #1e3c72;
+            background: #f0f5ff;
         }
         
         .tab.active {
-            color: #0066cc;
-            border-bottom: 3px solid #0066cc;
+            color: #1e3c72;
         }
         
-        .pinned-post {
-            background-color: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 5px solid #0066cc;
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 80%;
+            height: 4px;
+            background: #1e3c72;
+            border-radius: 2px;
+        }
+        
+        .posts-container {
+            padding: 20px 40px;
+            background: #f8f9fa;
+            min-height: calc(100vh - 620px);
+        }
+        
+        .post {
+            padding: 20px;
+            background: white;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .post:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .post-header {
@@ -165,102 +233,186 @@
         }
         
         .post-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            background-color: #4d94ff;
-            margin-right: 10px;
+            background: #e0e0e0;
+            margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
+            color: #1e3c72;
+            font-size: 20px;
         }
         
-        .post-info {
-            flex-grow: 1;
+        .post-user {
+            font-weight: bold;
+            color: #1e3c72;
         }
         
-        .post-author {
-            font-weight: bold;
-            color: #0066cc;
+        .post-handle {
+            color: #888;
+            margin-left: 8px;
         }
         
         .post-date {
-            color: #666;
-            font-size: 14px;
+            color: #888;
+            margin-left: 8px;
         }
         
         .post-content {
-            color: #333;
-            line-height: 1.5;
+            margin-left: 57px;
         }
         
-        .post-response {
-            color: #0066cc;
-            margin-top: 5px;
+        .post-reply {
+            color: #888;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .post-text {
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        /* Estilo para o ícone de perfil */
+        .profile-icon {
+            font-size: 70px;
+        }
+        
+        /* Ajustes para ocupar toda a tela */
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Barra de rolagem personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #1e3c72;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2a5298;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="profile-header">
+        <div class="header">
+            <div class="header-left">
+                <div class="back-arrow">←</div>
+                <div class="posts-count">1.234 Posts</div>
+            </div>
+        </div>
+        
+        <div class="profile-container">
+            <div class="cover">
+                <div class="profile-pic">
+                    <div class="profile-icon">👤</div>
+                </div>
+            </div>
+            
             <div class="profile-info">
-                <div class="profile-pic">P</div>
-                <div class="profile-details">
-                    <h1>piroka de açaí</h1>
-                    <p>1.644 posts</p>
-                    <button class="edit-profile-btn">Editor perfil</button>
+                <div class="profile-actions">
+                    <button class="edit-profile">Editar perfil</button>
+                </div>
+                
+                <div class="username">pírola de açaí</div>
+                <div class="handle">@aegoesaga_</div>
+                
+                <div class="bio">
+                    tolbox e strogonoff ●<br>
+                    - casa das primas ○ (Nadoão) em 8 de janeiro de 2008<br>
+                    - ingressou em julho de 2023
+                </div>
+                
+                <div class="stats">
+                    <div class="stat"><span>38</span> Seguindo</div>
+                    <div class="stat"><span>17</span> Seguidores</div>
                 </div>
             </div>
-        </div>
-        
-        <div class="profile-bio">
-            <h2>piroka de açaí</h2>
-            <p>@aegoeasgsa_</p>
-            <p>roblox e strogonoff 🌤</p>
-            <p>💬 casa das primas 💬 Nascido(a) em 8 de janeiro de 2008</p>
-            <p>💭 Ingressou em julho de 2023</p>
-        </div>
-        
-        <div class="profile-stats">
-            <div class="stat">
-                <div class="stat-number">38</div>
-                <div class="stat-label">Seguindo</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">17</div>
-                <div class="stat-label">Seguidores</div>
-            </div>
-        </div>
-        
-        <div class="private-section">
-            <h3>Privado</h3>
-            <p class="impressions">3.2K impressões no seu post nos últimos 7 dias</p>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active">Posts</div>
-            <div class="tab">Respostas</div>
-            <div class="tab">Destaques</div>
-            <div class="tab">Artigos</div>
-            <div class="tab">Mídia</div>
-            <div class="tab">Curtidas</div>
-        </div>
-        
-        <div class="pinned-post">
-            <div class="post-header">
-                <div class="post-avatar">P</div>
-                <div class="post-info">
-                    <div class="post-author">piroka de açaí</div>
-                    <div class="post-date">@aegoeasgsa_ · 17 de out</div>
+            
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div class="tab active">Posts</div>
+                    <div class="tab">Respostas</div>
+                    <div class="tab">Destaques</div>
+                    <div class="tab">Artigos</div>
+                    <div class="tab">Mídia</div>
+                    <div class="tab">Curtidas</div>
                 </div>
             </div>
-            <div class="post-content">
-                Em resposta a <span class="post-response">@_dominatriz_</span>
-                <p>Parabéns amg, mas bebe muito e nem é do ano</p>
+            
+            <div class="posts-container">
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">👤</div>
+                        <div class="post-user">pírola de açaí</div>
+                        <div class="post-handle">@aegoesaga_</div>
+                        <div class="post-date">· 7 de out</div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-reply">Em resposta a @_dominatrix_</div>
+                        <div class="post-text">Parabéns amg. mas bebé muito e nem é do ano</div>
+                    </div>
+                </div>
+                
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">👤</div>
+                        <div class="post-user">pírola de açaí</div>
+                        <div class="post-handle">@aegoesaga_</div>
+                        <div class="post-date">· 5 de out</div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-text">Finalmente chegou o fim de semana! Alguém mais animado? 😄 #sextou</div>
+                    </div>
+                </div>
+                
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">👤</div>
+                        <div class="post-user">pírola de açaí</div>
+                        <div class="post-handle">@aegoesaga_</div>
+                        <div class="post-date">· 3 de out</div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-text">Alguém tem recomendação de série boa pra maratonar? Preciso de algo pra relaxar depois do trabalho.</div>
+                    </div>
+                </div>
+                
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">👤</div>
+                        <div class="post-user">pírola de açaí</div>
+                        <div class="post-handle">@aegoesaga_</div>
+                        <div class="post-date">· 1 de out</div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-text">Hoje o açaí veio especial! Quem provou aprovou demais! 🍇💜</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Adicionando interatividade às abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
