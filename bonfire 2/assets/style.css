@@ -12,6 +12,10 @@ html, body {
   color: var(--light-cyan);
 }
 
+h2{
+  text-align: center;
+}
+
 .page-container {
   display: flex;
   flex-direction: column;

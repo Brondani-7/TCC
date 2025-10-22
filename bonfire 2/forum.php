@@ -6,7 +6,7 @@ $forumID = $_GET['id'];
 $stmt = $pdo->prepare("SELECT * FROM posts WHERE PostID = ?");
 $stmt->execute([$forumID]);
 
-echo "<h1>Posts do Fórum</h1>";
+echo "<h2>Posts do Fórum</h2>";
 while ($post = $stmt->fetch()) {
   echo "<div class='forum-card'>";
   echo "<p>" . htmlspecialchars($post['content']) . "</p>";

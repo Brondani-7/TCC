@@ -6,22 +6,7 @@ $categoria = $_GET['categoria'] ?? null;
 ?>
 
 <div class="layout">
-  <aside class="sidebar">
-    <div class="menu-icon">☰</div>
-    <nav>
-      <ul>
-        <li><a href="index.php?categoria=rpg">RPG</a></li>
-        <li><a href="index.php?categoria=estratégia">Estratégia</a></li>
-        <li><a href="index.php?categoria=corrida">Corrida</a></li>
-        <li><a href="index.php?categoria=ação">Ação</a></li>
-        <li><a href="index.php?categoria=indie">Indie</a></li>
-      </ul>
-    </nav>
-    
-  </aside>
-
   <main class="content">
-    <div class="profile-icon">👤</div>
     <h2>Fóruns <?= $categoria ? ucfirst($categoria) : "Recentes" ?></h2>
 
     <?php
