@@ -13,11 +13,46 @@
             font-family: 'Segoe UI', Arial, sans-serif;
         }
         
+        :root {
+            /* Variáveis para tema claro */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-tertiary: #888888;
+            --accent-color: #1e3c72;
+            --accent-hover: #2a5298;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --post-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            --post-hover-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --scrollbar-track: #f1f1f1;
+        }
+        
+        .dark-theme {
+            /* Variáveis para tema escuro */
+            --bg-primary: #15202b;
+            --bg-secondary: #192734;
+            --bg-tertiary: #1c2732;
+            --text-primary: #e1e8ed;
+            --text-secondary: #8b98a5;
+            --text-tertiary: #8b98a5;
+            --accent-color: #1d9bf0;
+            --accent-hover: #4ab3f4;
+            --border-color: #38444d;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+            --post-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            --post-hover-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            --scrollbar-track: #192734;
+        }
+        
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: #333;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+            color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
         
         .container {
@@ -25,19 +60,21 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: var(--bg-primary);
             border-radius: 0;
+            transition: all 0.3s ease;
         }
         
         .header {
-            background: white;
+            background: var(--bg-primary);
             height: 80px;
             padding: 0 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 2px solid #e0e0e0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
         
         .header-left {
@@ -48,24 +85,30 @@
         .posts-count {
             font-size: 22px;
             font-weight: bold;
-            color: #1e3c72;
+            color: var(--accent-color);
+            transition: all 0.3s ease;
         }
         
         .header-right {
             display: flex;
             align-items: center;
+            gap: 20px;
         }
         
-        .search-icon {
+        .search-icon, .theme-toggle {
             font-size: 20px;
-            color: #1e3c72;
+            color: var(--accent-color);
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .search-icon:hover {
-            color: #2a5298;
+        .search-icon:hover, .theme-toggle:hover {
+            color: var(--accent-hover);
             transform: scale(1.1);
+        }
+        
+        .theme-toggle.hidden {
+            display: none;
         }
         
         .profile-container {
@@ -76,17 +119,18 @@
         
         .cover {
             height: 250px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
             position: relative;
             border-radius: 0 0 20px 20px;
+            transition: all 0.3s ease;
         }
         
         .profile-pic {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            border: 5px solid white;
-            background-color: #e0e0e0;
+            border: 5px solid var(--bg-primary);
+            background-color: var(--border-color);
             position: absolute;
             bottom: -75px;
             left: 40px;
@@ -94,14 +138,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #1e3c72;
+            color: var(--accent-color);
             font-size: 50px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
         
         .profile-info {
             padding: 90px 40px 20px;
-            background: white;
+            background: var(--bg-primary);
+            transition: all 0.3s ease;
         }
         
         .profile-actions {
@@ -112,19 +158,19 @@
         
         .edit-profile {
             border: none;
-            color: white;
-            background: #1e3c72;
+            color: var(--bg-primary);
+            background: var(--accent-color);
             padding: 10px 20px;
             border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
+            box-shadow: 0 2px 8px rgba(29, 155, 240, 0.3);
         }
         
         .edit-profile:hover {
-            background: #2a5298;
+            background: var(--accent-hover);
             transform: translateY(-2px);
         }
         
@@ -132,23 +178,26 @@
             font-size: 26px;
             font-weight: bold;
             margin-bottom: 5px;
-            color: #1e3c72;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
         
         .handle {
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 20px;
             font-size: 16px;
+            transition: all 0.3s ease;
         }
         
         .bio {
             margin-bottom: 20px;
             line-height: 1.5;
-            color: #444;
+            color: var(--text-primary);
             padding: 0;
             border-radius: 0;
             border-left: none;
             background: transparent;
+            transition: all 0.3s ease;
         }
         
         .stats {
@@ -161,20 +210,23 @@
         
         .stat {
             margin-right: 30px;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 15px;
+            transition: all 0.3s ease;
         }
         
         .stat span {
-            color: #1e3c72;
+            color: var(--text-primary);
             font-weight: bold;
             font-size: 18px;
+            transition: all 0.3s ease;
         }
         
         .tabs-container {
-            background: white;
+            background: var(--bg-primary);
             padding: 0 40px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
         
         .tabs {
@@ -189,19 +241,19 @@
             justify-content: center;
             font-size: 16px;
             font-weight: bold;
-            color: #666;
+            color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
         }
         
         .tab:hover {
-            color: #1e3c72;
-            background: #f0f5ff;
+            color: var(--accent-color);
+            background: var(--bg-secondary);
         }
         
         .tab.active {
-            color: #1e3c72;
+            color: var(--accent-color);
         }
         
         .tab.active::after {
@@ -210,29 +262,31 @@
             bottom: 0;
             width: 80%;
             height: 4px;
-            background: #1e3c72;
+            background: var(--accent-color);
             border-radius: 2px;
         }
         
         .posts-container {
             padding: 20px 40px;
-            background: #f8f9fa;
+            background: var(--bg-secondary);
             min-height: calc(100vh - 620px);
+            transition: all 0.3s ease;
         }
         
         .post {
             padding: 20px;
-            background: white;
+            background: var(--bg-primary);
             margin-bottom: 15px;
             border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: var(--post-shadow);
             transition: all 0.3s;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
         }
         
         .post:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--post-hover-shadow);
+            background: var(--bg-tertiary);
         }
         
         .post-header {
@@ -245,28 +299,32 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            background: #e0e0e0;
+            background: var(--border-color);
             margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #1e3c72;
+            color: var(--accent-color);
             font-size: 20px;
+            transition: all 0.3s ease;
         }
         
         .post-user {
             font-weight: bold;
-            color: #1e3c72;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
         
         .post-handle {
-            color: #888;
+            color: var(--text-tertiary);
             margin-left: 8px;
+            transition: all 0.3s ease;
         }
         
         .post-date {
-            color: #888;
+            color: var(--text-tertiary);
             margin-left: 8px;
+            transition: all 0.3s ease;
         }
         
         .post-content {
@@ -274,14 +332,16 @@
         }
         
         .post-reply {
-            color: #888;
+            color: var(--text-tertiary);
             margin-bottom: 8px;
             font-size: 14px;
+            transition: all 0.3s ease;
         }
         
         .post-text {
             line-height: 1.5;
-            color: #333;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
         
         /* Estilo para o ícone de perfil */
@@ -301,20 +361,20 @@
         }
         
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: var(--scrollbar-track);
         }
         
         ::-webkit-scrollbar-thumb {
-            background: #1e3c72;
+            background: var(--accent-color);
             border-radius: 4px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #2a5298;
+            background: var(--accent-hover);
         }
     </style>
 </head>
-<body>
+<body class="dark-theme">
     <div class="container">
         <div class="header">
             <div class="header-left">
@@ -322,6 +382,8 @@
             </div>
             <div class="header-right">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <i class="fa-solid fa-sun theme-toggle" id="light-theme-toggle"></i>
+                <i class="fa-solid fa-moon theme-toggle hidden" id="dark-theme-toggle"></i>
             </div>
         </div>
         
@@ -416,6 +478,24 @@
     </div>
 
     <script>
+        // Elementos dos ícones de tema
+        const lightThemeToggle = document.getElementById('light-theme-toggle');
+        const darkThemeToggle = document.getElementById('dark-theme-toggle');
+        const body = document.body;
+        
+        // Função para alternar entre temas
+        function toggleTheme() {
+            body.classList.toggle('dark-theme');
+            
+            // Alternar a visibilidade dos ícones
+            lightThemeToggle.classList.toggle('hidden');
+            darkThemeToggle.classList.toggle('hidden');
+        }
+        
+        // Adicionar eventos de clique aos ícones
+        lightThemeToggle.addEventListener('click', toggleTheme);
+        darkThemeToggle.addEventListener('click', toggleTheme);
+        
         // Adicionando interatividade às abas
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
