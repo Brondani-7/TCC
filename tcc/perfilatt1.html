@@ -37,6 +37,7 @@
             justify-content: space-between;
             border-bottom: 1px solid #1e3c72;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
         
         .header-left {
@@ -80,8 +81,7 @@
         
         .profile-container {
             flex: 1;
-            overflow-y: auto;
-            padding: 0;
+            overflow: hidden;
             display: flex;
             max-width: 1200px;
             margin: 0 auto;
@@ -93,10 +93,14 @@
             padding: 20px;
             background: #152642;
             border-right: 1px solid #1e3c72;
+            flex-shrink: 0;
+            overflow-y: auto;
         }
         
         .main-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
         }
         
@@ -106,6 +110,7 @@
             position: relative;
             border-radius: 0 0 10px 10px;
             overflow: visible;
+            flex-shrink: 0;
         }
         
         .profile-pic {
@@ -126,6 +131,7 @@
             z-index: 10;
             cursor: pointer;
             transition: all 0.3s;
+            overflow: hidden;
         }
         
         .profile-pic:hover {
@@ -139,6 +145,7 @@
             margin-bottom: 20px;
             position: relative;
             z-index: 5;
+            flex-shrink: 0;
         }
         
         .profile-actions {
@@ -231,6 +238,7 @@
             background: #152642;
             padding: 0 30px;
             border-bottom: 1px solid #1e3c72;
+            flex-shrink: 0;
         }
         
         .tabs {
@@ -273,7 +281,8 @@
         .posts-container {
             padding: 20px 30px;
             background: #0e1a2b;
-            min-height: calc(100vh - 520px);
+            flex: 1;
+            overflow-y: visible;
         }
         
         .post {
@@ -309,6 +318,9 @@
             justify-content: center;
             color: #ff7b00;
             font-size: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
         }
         
         .post-user {
@@ -401,6 +413,11 @@
         
         .profile-icon {
             font-size: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
         
         html, body {
@@ -513,11 +530,11 @@
         }
         
         .icon-selection {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);  /* MUDE para 5 */
-    gap: 10px;
-    margin-top: 10px;
-}
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
         
         .icon-option {
             width: 50px;
@@ -547,29 +564,12 @@
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
             font-size: 18px;
-       }
-       
-       .profile-icon img, .post-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.photo-option .fa-check {
-    color: white;
-    font-size: 18px;
-}
-
+        }
+        
         .photo-option:hover {
-           background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
-       }
-
-       /* Input de arquivo escondido */
-       .file-input {
-       display: none;
-       }
-
+            background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+        }
+        
         .modal-actions {
             display: flex;
             gap: 15px;
@@ -605,6 +605,43 @@
         .cancel-btn:hover {
             background: #2a5298;
             color: #e1e7f0;
+        }
+        
+        /* CORREÇÕES CRÍTICAS PARA IMAGENS */
+        .profile-pic img,
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .profile-pic.has-image .profile-icon,
+        .post-avatar.has-image .profile-icon {
+            display: none;
+        }
+        
+        .profile-pic.has-image img,
+        .post-avatar.has-image img {
+            display: block;
+        }
+        
+        .photo-option .fa-check {
+            color: white;
+            font-size: 18px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .profile-pic,
+        .post-avatar {
+            position: relative;
         }
     </style>
 </head>
@@ -708,7 +745,9 @@
                 <div class="posts-container">
                     <div class="post">
                         <div class="post-header">
-                            <div class="post-avatar" id="postAvatar">🔥</div>
+                            <div class="post-avatar" id="postAvatar">
+                                <div class="profile-icon">🔥</div>
+                            </div>
                             <div class="post-user" id="postUsername">guilindo123</div>
                             <div class="post-handle" id="postHandle">@sukunayukitenkai_</div>
                             <div class="post-date">· 7 de out</div>
@@ -721,7 +760,9 @@
                     
                     <div class="post">
                         <div class="post-header">
-                            <div class="post-avatar" id="postAvatar2">🔥</div>
+                            <div class="post-avatar" id="postAvatar2">
+                                <div class="profile-icon">🔥</div>
+                            </div>
                             <div class="post-user" id="postUsername2">guilindo123</div>
                             <div class="post-handle" id="postHandle2">@sukunayukitenkai_</div>
                             <div class="post-date">· 5 de out</div>
@@ -730,54 +771,83 @@
                             <div class="post-text">Finalmente chegou o fim de semana! Alguém mais animado? 😄 #sextou</div>
                         </div>
                     </div>
+                    
+                    <!-- Adicionei mais posts para demonstrar a rolagem -->
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar" id="postAvatar3">
+                                <div class="profile-icon">🔥</div>
+                            </div>
+                            <div class="post-user" id="postUsername3">guilindo123</div>
+                            <div class="post-handle" id="postHandle3">@sukunayukitenkai_</div>
+                            <div class="post-date">· 3 de out</div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-text">Jogando Stardew Valley novamente, essa semana!</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar" id="postAvatar4">
+                                <div class="profile-icon">🔥</div>
+                            </div>
+                            <div class="post-user" id="postUsername4">guilindo123</div>
+                            <div class="post-handle" id="postHandle4">@sukunayukitenkai_</div>
+                            <div class="post-date">· 1 de out</div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-text">Alguém mais animado para o novo update do Minecraft?</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-   <!-- Modal de Edição -->
-<div class="edit-modal" id="editModal">
-    <div class="edit-modal-content">
-        <h2>Editar Perfil</h2>
-        
-        <div class="form-group">
-            <label for="username">Nome de usuário</label>
-            <input type="text" id="username" value="guilindo123">
-        </div>
-        
-        <div class="form-group">
-            <label for="handle">@</label>
-            <input type="text" id="handle" value="sukunayukitenkai_">
-        </div>
-        
-        <div class="form-group">
-            <label for="bio">Biografia</label>
-            <textarea id="bio">sonic autist ●
+    <!-- Modal de Edição -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-content">
+            <h2>Editar Perfil</h2>
+            
+            <div class="form-group">
+                <label for="username">Nome de usuário</label>
+                <input type="text" id="username" value="guilindo123">
+            </div>
+            
+            <div class="form-group">
+                <label for="handle">@</label>
+                <input type="text" id="handle" value="sukunayukitenkai_">
+            </div>
+            
+            <div class="form-group">
+                <label for="bio">Biografia</label>
+                <textarea id="bio">sonic autist ●
 - casa das primas ○ (Nadoão) em 8 de janeiro de 2008
 - ingressou em julho de 2023</textarea>
-        </div>
-        
-        <div class="form-group">
-            <label>Ícone do perfil</label>
-            <div class="icon-selection">
-                <div class="icon-option" data-icon="🔥">🔥</div>
-                <div class="icon-option" data-icon="🎮">🎮</div>
-                <div class="icon-option" data-icon="⚔️">⚔️</div>
-                <div class="icon-option" data-icon="👻">👻</div>
-                <div class="icon-option photo-option" data-icon="photo">
-                    <i class="fas fa-camera"></i>
+            </div>
+            
+            <div class="form-group">
+                <label>Ícone do perfil</label>
+                <div class="icon-selection">
+                    <div class="icon-option" data-icon="🔥">🔥</div>
+                    <div class="icon-option" data-icon="🎮">🎮</div>
+                    <div class="icon-option" data-icon="⚔️">⚔️</div>
+                    <div class="icon-option" data-icon="👻">👻</div>
+                    <div class="icon-option photo-option" data-icon="photo">
+                        <i class="fas fa-camera"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="modal-actions">
-            <button class="cancel-btn" id="cancelEdit">Cancelar</button>
-            <button class="save-btn" id="saveProfile">Salvar</button>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn" id="cancelEdit">Cancelar</button>
+                <button class="save-btn" id="saveProfile">Salvar</button>
+            </div>
         </div>
     </div>
-</div>
 
-        <script>
+    <script>
         // Elementos do DOM
         const editProfileBtn = document.getElementById('editProfileBtn');
         const editModal = document.getElementById('editModal');
@@ -795,12 +865,7 @@
         const displayHandle = document.getElementById('displayHandle');
         const displayBio = document.getElementById('displayBio');
         const profileIcon = document.getElementById('profileIcon');
-        const postAvatar = document.getElementById('postAvatar');
-        const postAvatar2 = document.getElementById('postAvatar2');
-        const postUsername = document.getElementById('postUsername');
-        const postUsername2 = document.getElementById('postUsername2');
-        const postHandle = document.getElementById('postHandle');
-        const postHandle2 = document.getElementById('postHandle2');
+        const profilePicture = document.getElementById('profilePicture');
 
         // Ícone selecionado e foto
         let selectedIcon = '🔥';
@@ -813,6 +878,55 @@
         fileInput.className = 'file-input';
         document.body.appendChild(fileInput);
 
+        // Função para atualizar TODOS os avatares
+        function updateAllProfileImages(photo, icon) {
+            // Atualizar foto principal do perfil
+            updateProfileImage(profilePicture, photo, icon);
+            
+            // Atualizar TODOS os avatares dos posts
+            const allPostAvatars = document.querySelectorAll('.post-avatar');
+            allPostAvatars.forEach(avatar => {
+                updateProfileImage(avatar, photo, icon);
+            });
+            
+            // Atualizar TODOS os nomes de usuário e handles
+            const allPostUsernames = document.querySelectorAll('.post-user');
+            const allPostHandles = document.querySelectorAll('.post-handle');
+            
+            allPostUsernames.forEach(username => {
+                username.textContent = usernameInput.value;
+            });
+            
+            allPostHandles.forEach(handle => {
+                handle.textContent = `@${handleInput.value}`;
+            });
+        }
+
+        // Função para atualizar imagem do perfil
+        function updateProfileImage(container, photo, icon) {
+            // Limpar conteúdo anterior
+            const existingImg = container.querySelector('img');
+            if (existingImg) {
+                existingImg.remove();
+            }
+            
+            if (photo) {
+                // Adicionar nova imagem
+                const img = document.createElement('img');
+                img.src = photo;
+                img.alt = 'Foto de perfil';
+                container.appendChild(img);
+                container.classList.add('has-image');
+            } else {
+                // Usar ícone
+                container.classList.remove('has-image');
+                const iconElement = container.querySelector('.profile-icon');
+                if (iconElement) {
+                    iconElement.textContent = icon;
+                }
+            }
+        }
+
         // Carregar dados salvos
         function loadProfileData() {
             const savedData = localStorage.getItem('profileData');
@@ -822,23 +936,11 @@
                 displayHandle.textContent = `@${data.handle}`;
                 displayBio.innerHTML = data.bio.replace(/\n/g, '<br>');
                 
-                // Carregar foto ou ícone
-                if (data.photo) {
-                    profileIcon.innerHTML = `<img src="${data.photo}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    postAvatar.innerHTML = `<img src="${data.photo}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    postAvatar2.innerHTML = `<img src="${data.photo}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    uploadedPhoto = data.photo;
-                } else {
-                    profileIcon.textContent = data.icon;
-                    postAvatar.textContent = data.icon;
-                    postAvatar2.textContent = data.icon;
-                    selectedIcon = data.icon;
-                }
+                // Atualizar foto ou ícone em TODOS os lugares
+                updateAllProfileImages(data.photo, data.icon);
                 
-                postUsername.textContent = data.username;
-                postUsername2.textContent = data.username;
-                postHandle.textContent = `@${data.handle}`;
-                postHandle2.textContent = `@${data.handle}`;
+                uploadedPhoto = data.photo;
+                selectedIcon = data.icon;
                 
                 // Preencher formulário
                 usernameInput.value = data.username;
@@ -921,21 +1023,8 @@
             displayHandle.textContent = `@${profileData.handle}`;
             displayBio.innerHTML = profileData.bio.replace(/\n/g, '<br>');
             
-            // Atualizar foto ou ícone
-            if (profileData.photo) {
-                profileIcon.innerHTML = `<img src="${profileData.photo}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                postAvatar.innerHTML = `<img src="${profileData.photo}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                postAvatar2.innerHTML = `<img src="${profileData.photo}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-            } else {
-                profileIcon.textContent = profileData.icon;
-                postAvatar.textContent = profileData.icon;
-                postAvatar2.textContent = profileData.icon;
-            }
-            
-            postUsername.textContent = profileData.username;
-            postUsername2.textContent = profileData.username;
-            postHandle.textContent = `@${profileData.handle}`;
-            postHandle2.textContent = `@${profileData.handle}`;
+            // Atualizar foto ou ícone em TODOS os lugares
+            updateAllProfileImages(profileData.photo, profileData.icon);
             
             // Fechar modal
             editModal.style.display = 'none';
