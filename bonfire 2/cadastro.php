@@ -4,10 +4,11 @@ include('includes/db.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $email = $_POST['email'];
   $name = $_POST['name'];
-  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+  $senha = $_POST['password'];
+  $hash = password_hash($senha, PASSWORD_DEFAULT);
 
   $stmt = $pdo->prepare("INSERT INTO usuários (Email, Name, Password) VALUES (?, ?, ?)");
-  $stmt->execute([$email, $name, $password]);
+  $stmt->execute([$email, $nome, $hash]);
 
   header("Location: login.php");
 }

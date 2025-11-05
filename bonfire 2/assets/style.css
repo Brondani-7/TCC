@@ -18,6 +18,40 @@ html, body {
   transition: background-color 0.3s, color 0.3s;
 }
 
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* links à esquerda, ícone à direita */
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li a {
+  color: var(--light-cyan);
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+nav ul li a:hover {
+  background-color: var(--light-cyan);
+  color: var(--oxford-blue);
+}
+
+.profile-icon {
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: auto; /* garante que vá para a direita */
+}
+
+
 h2 {
   text-align: center;
   margin-top: 20px;
@@ -28,6 +62,18 @@ h2 {
   flex-direction: column;
   min-height: 100vh;
 }
+
+.profile-icon a {
+  font-size: 24px;
+  text-decoration: none;
+  color: var(--light-cyan);
+  transition: color 0.3s;
+}
+
+.profile-icon a:hover {
+  color: #c0e6ea; /* tom mais claro no hover */
+}
+
 
 /* Header e Footer fixos */
 header, footer {
@@ -41,58 +87,6 @@ header, footer {
 .layout {
   display: flex;
   flex: 1;
-}
-
-/* Sidebar lateral */
-.sidebar {
-  width: 220px;
-  background-color: var(--black);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.sidebar .menu-icon {
-  font-size: 24px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.sidebar nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar nav ul li {
-  margin: 10px 0;
-}
-
-.sidebar nav ul li a {
-  color: var(--light-cyan);
-  font-weight: bold;
-  text-decoration: none;
-  padding: 8px 12px;
-  display: block;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
-
-.sidebar nav ul li a:hover {
-  background-color: var(--light-cyan);
-  color: var(--oxford-blue);
-}
-
-/* Modo claro toggle */
-.mode-toggle {
-  margin-top: 20px;
-  text-align: center;
-  color: var(--light-cyan);
-}
-
-.mode-toggle label {
-  margin-right: 10px;
 }
 
 /* Área de conteúdo */
@@ -136,12 +130,4 @@ button {
 
 button:hover {
   background-color: #c0e6ea;
-}
-
-/* Modo claro dinâmico */
-.light-mode {
-  --bg-color: #E0FBFC;
-  --text-color: #001B2E;
-  --card-bg: #ffffff;
-  --card-border: #001B2E;
 }

@@ -6,16 +6,9 @@ $categoria = $_GET['categoria'] ?? null;
 ?>
 
 <div class="layout">
-  <?php
-require_once 'includes/db.php';
-include('includes/header.php');
+   
 
-$categoria = $_GET['categoria'] ?? null;
-?>
-
-<div class="layout">
   <main class="content">
-    <div class="profile-icon">👤</div>
     <h2>Fóruns <?= $categoria ? ucfirst($categoria) : "Recentes" ?></h2>
 
     <?php
@@ -43,4 +36,3 @@ $categoria = $_GET['categoria'] ?? null;
 <?php include('includes/footer.php'); ?>
 
   
-

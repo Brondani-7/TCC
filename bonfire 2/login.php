@@ -14,14 +14,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['user_id'] = $user['CustomerID'];
     $_SESSION['user_name'] = $user['Name'];
     header("Location: index.php");
+    exit;
   } else {
-    echo "Credenciais inválidas.";
+    $erro = "Credenciais inválidas.";
   }
 }
 ?>
 
 <form method="POST">
-  <input type="email" name="email" placeholder="Email" required>
-  <input type="password" name="password" placeholder="Senha" required>
+  <input type="email" name="email" placeholder="email" required>
+  <input type="password" name="password" placeholder="senha" required>
   <button type="submit">Entrar</button>
 </form>
+
+<?php if (isset($erro)) echo "<p style='color:red;'>$erro</p>"; ?>

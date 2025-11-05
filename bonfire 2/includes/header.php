@@ -10,7 +10,8 @@
       <li><a href="index.php?categoria=estrategia">Estratégia</a></li>
       <li><a href="index.php?categoria=indie">Indie</a></li>
     </ul>
-  </nav>
+  <div class="profile-icon" ><a href="login.php">👤</a></div>
+</nav>
 </header>
 <body>
 <div class="page-container">
