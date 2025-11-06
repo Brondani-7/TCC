@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa - Bonfire Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: #0e1a2b;
+            color: #e1e7f0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #0e1a2b;
+        }
+        
+        .header {
+            background: #152642;
+            height: 70px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1e3c72;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff7b00;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-icon, .profile-icon {
+            font-size: 18px;
+            color: #8fa3c2;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-link, .notification-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            padding: 8px;
+        }
+        
+        .profile-link:hover, .notification-link:hover {
+            background-color: rgba(255, 123, 0, 0.1);
+        }
+        
+        .profile-pic-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2a5298;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7b00;
+            font-size: 18px;
+        }
+        
+        /* Search Header */
+        .search-header {
+            background: #0e1a2b;
+            padding: 40px 30px 20px;
+            border-bottom: 1px solid #1e3c72;
+            position: relative;
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 18px 60px 18px 25px;
+            background: #152642;
+            border: 2px solid #1e3c72;
+            border-radius: 30px;
+            color: #e1e7f0;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #ff7b00;
+            box-shadow: 0 0 0 3px rgba(255, 123, 0, 0.2);
+        }
+        
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ff7b00;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-button:hover {
+            background: #ff9a42;
+        }
+
+        /* Dropdown do Pinterest */
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #152642;
+            border: 1px solid #1e3c72;
+            border-radius: 16px;
+            margin-top: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .search-dropdown.active {
+            display: block;
+        }
+
+        .dropdown-section {
+            padding: 20px;
+            border-bottom: 1px solid #1e3c72;
+        }
+
+        .dropdown-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff7b00;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .suggestions-grid, .history-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .suggestion-item, .history-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .suggestion-item:hover, .history-item:hover {
+            background: rgba(255, 123, 0, 0.1);
+        }
+
+        .suggestion-icon, .history-icon {
+            margin-right: 12px;
+            color: #8fa3c2;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .suggestion-text, .history-text {
+            flex: 1;
+            color: #e1e7f0;
+            font-size: 15px;
+        }
+
+        .delete-history {
+            background: none;
+            border: none;
+            color: #8fa3c2;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+
+        .history-item:hover .delete-history {
+            opacity: 1;
+        }
+
+        .delete-history:hover {
+            color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .clear-all {
+            width: 100%;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #8fa3c2;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .clear-all:hover {
+            color: #ff7b00;
+            background: rgba(255, 123, 0, 0.1);
+        }
+        
+        /* Pinterest Style Grid */
+        .pinterest-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        
+        .pin-card {
+            background: #152642;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #1e3c72;
+            break-inside: avoid;
+        }
+        
+        .pin-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+            border-color: #ff7b00;
+        }
+        
+        .pin-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1e3c72 0%, #6a11cb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pin-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .pin-content {
+            padding: 15px;
+        }
+        
+        .pin-title {
+            font-weight: bold;
+            color: #ff7b00;
+            margin-bottom: 8px;
+            font-size: 16px;
+            line-height: 1.3;
+        }
+        
+        .pin-description {
+            color: #8fa3c2;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .pin-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .pin-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #2a5298;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7b00;
+            font-size: 12px;
+        }
+        
+        .user-name {
+            font-size: 12px;
+            color: #8fa3c2;
+        }
+        
+        .pin-stats {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .pin-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #8fa3c2;
+            font-size: 12px;
+        }
+        
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            padding: 10px 20px;
+            background: #152642;
+            border: 1px solid #1e3c72;
+            border-radius: 20px;
+            color: #8fa3c2;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: #ff7b00;
+            color: white;
+            border-color: #ff7b00;
+        }
+        
+        /* Overlay para fechar o dropdown */
+        .dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+
+        .dropdown-overlay.active {
+            display: block;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0e1a2b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #ff7b00;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff9a42;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">BONFIRE GAMES</div>
+            </div>
+            <div class="header-right">
+                <a href="notificacoes.html" class="notification-link">
+                    <i class="fa-solid fa-bell notification-icon"></i>
+                </a>
+                <a href="perfilatt1.html" class="profile-link">
+                    <div class="profile-pic-small">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div class="search-header">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Pesquisar jogos, builds, usuários..." id="searchInput">
+                    <button class="search-button" id="searchButton">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    
+                    <!-- Dropdown estilo Pinterest -->
+                    <div class="search-dropdown" id="searchDropdown">
+                        <div class="dropdown-section">
+                            <div class="section-title">Sugestões</div>
+                            <div class="suggestions-grid">
+                                <a href="#" class="suggestion-item" data-search="Minecraft builds">
+                                    <div class="suggestion-icon">🎮</div>
+                                    <div class="suggestion-text">Minecraft builds</div>
+                                </a>
+                                <a href="#" class="suggestion-item" data-search="Stardew Valley farm">
+                                    <div class="suggestion-icon">🌾</div>
+                                    <div class="suggestion-text">Stardew Valley farm</div>
+                                </a>
+                                <a href="#" class="suggestion-item" data-search="Terraria arena">
+                                    <div class="suggestion-icon">⚔️</div>
+                                    <div class="suggestion-text">Terraria arena</div>
+                                </a>
+                                <a href="#" class="suggestion-item" data-search="Pixel art">
+                                    <div class="suggestion-icon">🎨</div>
+                                    <div class="suggestion-text">Pixel art</div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown-section" id="historySection">
+                            <div class="section-title">Histórico de pesquisa</div>
+                            <div class="history-grid" id="historyGrid">
+                                <!-- Histórico será gerado aqui -->
+                            </div>
+                            <button class="clear-all" id="clearAllHistory">
+                                Limpar todo o histórico
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="categories">
+                    <button class="category-btn active" data-category="all">Tudo</button>
+                    <button class="category-btn" data-category="games">Jogos</button>
+                    <button class="category-btn" data-category="builds">Builds</button>
+                    <button class="category-btn" data-category="art">Arte</button>
+                    <button class="category-btn" data-category="users">Usuários</button>
+                    <button class="category-btn" data-category="communities">Comunidades</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay para fechar dropdown -->
+        <div class="dropdown-overlay" id="dropdownOverlay"></div>
+        
+        <div class="pinterest-grid" id="pinterestGrid">
+            <!-- Conteúdo do grid Pinterest -->
+            <div class="pin-card">
+                <div class="pin-image">🎮</div>
+                <div class="pin-content">
+                    <div class="pin-title">Castelo Medieval no Minecraft</div>
+                    <div class="pin-description">Build impressionante de um castelo com detalhes góticos</div>
+                    <div class="pin-meta">
+                        <div class="pin-user">
+                            <div class="user-avatar">B</div>
+                            <div class="user-name">BuildMaster</div>
+                        </div>
+                        <div class="pin-stats">
+                            <div class="pin-stat"><i class="fas fa-heart"></i> 2.4k</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mais cards... -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const searchDropdown = document.getElementById('searchDropdown');
+            const dropdownOverlay = document.getElementById('dropdownOverlay');
+            const historyGrid = document.getElementById('historyGrid');
+            const clearAllHistory = document.getElementById('clearAllHistory');
+            const suggestionItems = document.querySelectorAll('.suggestion-item');
+            const categoryBtns = document.querySelectorAll('.category-btn');
+
+            // Histórico
+            let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+            // Atualizar histórico no dropdown
+            function updateHistoryDisplay() {
+                historyGrid.innerHTML = '';
+                
+                if (searchHistory.length === 0) {
+                    document.getElementById('historySection').style.display = 'none';
+                    return;
+                }
+                
+                document.getElementById('historySection').style.display = 'block';
+                
+                searchHistory.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-icon">🔍</div>
+                        <div class="history-text">${item}</div>
+                        <button class="delete-history" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    historyItem.addEventListener('click', function(e) {
+                        if (!e.target.closest('.delete-history')) {
+                            searchInput.value = item;
+                            performSearch(item);
+                            closeDropdown();
+                        }
+                    });
+                    
+                    const deleteBtn = historyItem.querySelector('.delete-history');
+                    deleteBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        deleteHistoryItem(parseInt(this.dataset.index));
+                    });
+                    
+                    historyGrid.appendChild(historyItem);
+                });
+            }
+
+            function addToHistory(term) {
+                if (!term.trim()) return;
+                
+                searchHistory = searchHistory.filter(item => 
+                    item.toLowerCase() !== term.toLowerCase()
+                );
+                searchHistory.unshift(term);
+                
+                if (searchHistory.length > 5) {
+                    searchHistory = searchHistory.slice(0, 5);
+                }
+                
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+                updateHistoryDisplay();
+            }
+
+            function deleteHistoryItem(index) {
+                searchHistory.splice(index, 1);
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+                updateHistoryDisplay();
+            }
+
+            function clearHistory() {
+                if (searchHistory.length === 0) return;
+                
+                const confirmClear = confirm('Limpar todo o histórico de pesquisa?');
+                if (confirmClear) {
+                    searchHistory = [];
+                    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+                    updateHistoryDisplay();
+                }
+            }
+
+            // Controle do dropdown
+            function openDropdown() {
+                searchDropdown.classList.add('active');
+                dropdownOverlay.classList.add('active');
+            }
+
+            function closeDropdown() {
+                searchDropdown.classList.remove('active');
+                dropdownOverlay.classList.remove('active');
+            }
+
+            // Pesquisa
+            function performSearch(term) {
+                if (!term.trim()) return;
+                
+                addToHistory(term);
+                searchInput.value = term;
+                closeDropdown();
+                
+                // Simular resultados
+                console.log('Pesquisando por:', term);
+            }
+
+            // Event Listeners
+            searchInput.addEventListener('focus', openDropdown);
+            searchButton.addEventListener('click', () => performSearch(searchInput.value));
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch(searchInput.value);
+            });
+            
+            dropdownOverlay.addEventListener('click', closeDropdown);
+            clearAllHistory.addEventListener('click', clearHistory);
+
+            // Sugestões
+            suggestionItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const searchTerm = this.dataset.search;
+                    searchInput.value = searchTerm;
+                    performSearch(searchTerm);
+                });
+            });
+
+            // Categorias
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Inicializar
+            updateHistoryDisplay();
+        });
+    </script>
+</body>
+</html>
