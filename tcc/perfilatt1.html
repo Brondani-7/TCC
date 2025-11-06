@@ -66,7 +66,44 @@
             align-items: center;
             gap: 20px;
         }
-        
+        .notification-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.notification-link:hover {
+    background-color: rgba(255, 123, 0, 0.1);
+}
+
+.notification-link:hover .notification-icon {
+    color: #ff7b00;
+    transform: scale(1.1);
+} 
+
+.search-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.search-link:hover {
+    background-color: rgba(255, 123, 0, 0.1);
+}
+
+.search-link:hover .search-icon {
+    color: #ff7b00;
+    transform: scale(1.1);
+} 
+
         .search-icon, .notification-icon {
             font-size: 18px;
             color: #8fa3c2;
@@ -652,11 +689,15 @@
                 <div class="logo">BONFIRE GAMES</div>
             </div>
             <div class="header-right">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <i class="fa-solid fa-bell notification-icon"></i>
-            </div>
+    <a href="pesquisa.html" class="search-link">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    </a>
+    <a href="notificacoes.html" class="notification-link">
+        <i class="fa-solid fa-bell notification-icon"></i>
+    </a>
+</div>
         </div>
-        
+
         <div class="profile-container">
             <div class="sidebar">
                 <div class="sidebar-section">
@@ -848,6 +889,8 @@
     </div>
 
     <script>
+
+
         // Elementos do DOM
         const editProfileBtn = document.getElementById('editProfileBtn');
         const editModal = document.getElementById('editModal');
