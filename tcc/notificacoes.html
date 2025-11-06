@@ -68,7 +68,24 @@
             color: #ff7b00;
             transform: scale(1.1);
         }
-        
+        .profile-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.profile-link:hover {
+    background-color: rgba(255, 123, 0, 0.1);
+    transform: scale(1.05);
+}
+
+.profile-link:hover .profile-pic-small {
+    transform: scale(1.1);
+}   
+
         .profile-pic-small {
             width: 40px;
             height: 40px;
@@ -507,12 +524,16 @@
             <div class="header-left">
                 <div class="logo">BONFIRE GAMES</div>
             </div>
-            <div class="header-right">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <div class="profile-pic-small">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
+           <div class="header-right">
+    <a href="pesquisa.html" class="search-link">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    </a>
+    <a href="perfilatt1.html" class="profile-link">
+        <div class="profile-pic-small">
+            <i class="fas fa-user"></i>
+        </div>
+    </a>
+</div>
         </div>
         
         <div class="main-container">
