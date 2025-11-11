@@ -1,192 +1,243 @@
 <?php
-// search.php: Aqui você pode fazer o processamento da pesquisa, por exemplo, buscar no banco de dados ou em um arquivo.
-if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['q'])) {
-    $searchQuery = htmlspecialchars($_GET['q']);
-    // A lógica de busca real seria aqui, talvez conectando ao banco de dados ou realizando a pesquisa em arquivos.
-    // Exemplo de resposta (apenas para fins de demonstração):
-    echo "<h2>Resultados para: " . $searchQuery . "</h2>";
-    // Coloque a lógica de pesquisa real abaixo
-    // Ex: Buscar dados no banco ou no arquivo
+// Configurações básicas
+session_start();
+
+// Dados mock para desenvolvimento
+$fangames = [
+    [
+        'id' => 1,
+        'title' => 'Sonic Adventure DX',
+        'description' => 'Remake do clássico jogo do Sonic em Unity',
+        'developer' => 'SonicFanBR',
+        'downloads' => 1250,
+        'rating' => 4.5,
+        'genre' => 'plataforma',
+        'franchise' => 'sonic',
+        'status' => 'active',
+        'tags' => ['2D', 'Velocidade', 'Clássico']
+    ],
+    [
+        'id' => 2,
+        'title' => 'Pokémon Dark Version',
+        'description' => 'Fangame Pokémon com história sombria',
+        'developer' => 'PokeMaster',
+        'downloads' => 890,
+        'rating' => 4.2,
+        'genre' => 'rpg',
+        'franchise' => 'pokemon',
+        'status' => 'active',
+        'tags' => ['RPG', 'Turnos', 'Aventura']
+    ]
+];
+
+// Função simples para verificar login
+function isLoggedIn() {
+    return isset($_SESSION['user_id']);
 }
+
+$pageTitle = "Firelink Shrine";
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <title>Bonfire Games</title>
-    <style>
-        /* Reset básico */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Fundo com o gif da fogueira */
-        body {
-            height: 100vh;
-            background: url('img/inicial.gif') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-            padding-top: 80px; /* espaço para o menu */
-        }
-
-        /* Menu fixo no topo */
-        .top-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(0,0,0,0.9);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.7);
-            z-index: 1000;
-        }
-
-        /* Logo no menu */
-        .menu-logo {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #ff6600; /* cor laranja para destacar */
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Menu de categorias */
-        .menu-nav ul {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-        }
-
-        .menu-nav li a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .menu-nav li a:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-
-        /* Container principal para centralizar logo e barra */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 80px);
-        }
-
-        /* Logo grande */
-        .logo {
-            font-size: 6rem;
-            font-weight: 900;
-            margin-bottom: 40px;
-            user-select: none;
-        }
-
-        /* Container da barra de pesquisa */
-        .search-container {
-            width: 100%;
-            max-width: 600px;
-        }
-
-        /* Estilo da barra de pesquisa estilo Google */
-        .search-container form {
-            display: flex;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            background-color: rgba(255,255,255,0.9);
-            padding: 8px 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .search-container input[type="text"] {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-size: 1.2rem;
-            padding: 8px 12px;
-            border-radius: 24px;
-            font-weight: 500;
-        }
-
-        .search-container button {
-            background-color: #4285F4;
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 8px 20px;
-            margin-left: 10px;
-            border-radius: 24px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .search-container button:hover {
-            background-color: #357ae8;
-        }
-
-        /* Responsividade */
-        @media (max-width: 640px) {
-            .top-menu {
-                padding: 10px 20px;
-            }
-            .menu-logo {
-                font-size: 1.5rem;
-            }
-            .menu-nav ul {
-                gap: 15px;
-            }
-            .menu-nav li a {
-                font-size: 0.9rem;
-                padding: 8px 12px;
-            }
-            .logo {
-                font-size: 4rem;
-                margin-bottom: 30px;
-            }
-            .search-container {
-
-
-
-                max-width: 90%;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $pageTitle; ?> | BONFIRE GAMES</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body>
-    <div class="top-menu">
-        <div class="menu-logo">BONFIRE GAMES</div>
-        <nav class="menu-nav">
-            <ul>
-                <li><a href="index.php">Firelink</a></li>
-                <li><a href="#">Fansgames</a></li>
-                <li><a href="forum.php">Bonfires</a></li>
-                <li><a href="#">Sobre</a></li>
-            </ul>
-        </nav>
-    </div>
-
-    <div class="main-content">
-        <div class="logo">BONFIRE GAMES</div>
-        <div class="search-container">
-            <form action="search.php" method="GET">
-                <input type="text" name="q" placeholder="Bear. Seek. Seek. Lest." autocomplete="off" required />
-                <button type="submit">Buscar</button>
-            </form>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-fire"></i>
+            <span>BONFIRE GAMES</span>
         </div>
-    </div>
+        
+        <nav class="nav-top">
+            <a href="index.php" class="nav-link active">
+                <i class="fas fa-home"></i> Início
+            </a>
+            <a href="pages/fangames.php" class="nav-link">
+                <i class="fas fa-gamepad"></i> Fangames
+            </a>
+            <a href="pages/forum.php" class="nav-link">
+                <i class="fas fa-users"></i> Comunidade
+            </a>
+            <a href="pages/search.php" class="nav-link">
+                <i class="fas fa-search"></i> Pesquisar
+            </a>
+        </nav>
+
+        <div class="header-actions">
+            <?php if(isLoggedIn()): ?>
+                <div class="user-menu">
+                    <a href="pages/profile.php" class="nav-link">
+                        <i class="fas fa-user"></i> Perfil
+                    </a>
+                    <a href="pages/logout.php" class="btn btn-secondary">Sair</a>
+                </div>
+            <?php else: ?>
+                <div class="auth-buttons">
+                    <a href="pages/login.php" class="btn btn-secondary">Entrar</a>
+                    <a href="pages/register.php" class="btn btn-primary">Cadastrar</a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>BONFIRE GAMES</h1>
+                <p class="hero-subtitle">Uma jornada começa com um único passo... ou um único jogo</p>
+                
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo count($fangames); ?></div>
+                        <div class="stat-label">Fangames</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">42</div>
+                        <div class="stat-label">Criadores</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1.2K</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="pages/fangames.php" class="btn btn-primary btn-large">
+                        <i class="fas fa-gamepad"></i>
+                        Explorar Fangames
+                    </a>
+                    <?php if(!isLoggedIn()): ?>
+                    <a href="pages/register.php" class="btn btn-secondary btn-large">
+                        <i class="fas fa-user-plus"></i>
+                        Juntar-se à Fogueira
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fangames em Destaque -->
+        <section class="featured-section">
+            <h2 class="section-title">
+                <i class="fas fa-crown"></i>
+                Fangames em Destaque
+            </h2>
+            
+            <div class="games-grid">
+                <?php
+                $featuredGames = array_slice($fangames, 0, 3);
+                foreach($featuredGames as $game): 
+                ?>
+                <div class="game-card featured">
+                    <div class="game-cover">
+                        <i class="fas fa-<?php echo $game['franchise'] == 'sonic' ? 'bolt' : 'dragon'; ?>"></i>
+                        <div class="game-badge">Destaque</div>
+                    </div>
+                    <div class="game-info">
+                        <h3 class="game-title"><?php echo $game['title']; ?></h3>
+                        <p class="game-description"><?php echo $game['description']; ?></p>
+                        
+                        <div class="game-meta">
+                            <div class="game-developer">
+                                <i class="fas fa-user"></i>
+                                <?php echo $game['developer']; ?>
+                            </div>
+                            <div class="game-stats">
+                                <span class="game-stat">
+                                    <i class="fas fa-download"></i>
+                                    <?php echo number_format($game['downloads']); ?>
+                                </span>
+                                <span class="game-stat">
+                                    <i class="fas fa-star"></i>
+                                    <?php echo $game['rating']; ?>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="game-tags">
+                            <?php foreach(array_slice($game['tags'], 0, 2) as $tag): ?>
+                            <span class="game-tag"><?php echo $tag; ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <a href="pages/game.php?id=<?php echo $game['id']; ?>" class="btn btn-secondary">
+                            Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <i class="fas fa-fire"></i>
+                    <span>BONFIRE GAMES</span>
+                </div>
+                <p class="footer-desc">
+                    Plataforma para fangames criados pela comunidade. 
+                    Descubra, compartilhe, jogue.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Navegação</h4>
+                    <a href="index.php">Início</a>
+                    <a href="pages/fangames.php">Fangames</a>
+                    <a href="pages/forum.php">Comunidade</a>
+                </div>
+
+                <div class="link-group">
+                    <h4>Ajuda</h4>
+                    <a href="#">Suporte</a>
+                    <a href="#">FAQ</a>
+                    <a href="#">Contato</a>
+                </div>
+
+                <div class="link-group">
+                    <h4>Legal</h4>
+                    <a href="#">Termos</a>
+                    <a href="#">Privacidade</a>
+                </div>
+            </div>
+
+            <div class="footer-social">
+                <h4>Conecte-se</h4>
+                <div class="social-icons">
+                    <a href="#" class="social-btn" title="Discord">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                    <a href="#" class="social-btn" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-btn" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                &copy; 2024 BONFIRE GAMES. Desenvolvido com ♥ pela comunidade.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
 </body>
 </html>
