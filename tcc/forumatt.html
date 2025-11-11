@@ -40,109 +40,16 @@
             min-height: 100vh;
         }
         
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background: var(--dark-light);
-            border-right: 1px solid var(--border);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 20px 20px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-        
-        .logo i {
-            font-size: 26px;
-        }
-        
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            padding: 0 10px;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s;
-            margin-bottom: 5px;
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            color: var(--primary);
-            background: rgba(255, 123, 0, 0.1);
-        }
-        
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .trending-topics {
-            margin-top: 20px;
-            padding: 0 20px;
-        }
-        
-        .trending-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .trending-item {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(30, 60, 114, 0.3);
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        
-        .trending-item:hover {
-            color: var(--primary);
-        }
-        
-        .trending-name {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-        
-        .trending-stats {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
         /* Main Content */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
         }
         
         .header {
             background: var(--dark-light);
-            padding: 15px 20px;
+            padding: 15px 30px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -150,12 +57,16 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            width: 100%;
         }
         
         .page-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .header-actions {
@@ -198,6 +109,9 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
         
         .create-post {
@@ -418,128 +332,6 @@
             color: var(--primary);
         }
         
-        /* Right Sidebar */
-        .right-sidebar {
-            width: 300px;
-            background: var(--dark-light);
-            border-left: 1px solid var(--border);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .widget {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid var(--border);
-        }
-        
-        .widget-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .online-users {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .user-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .user-item:hover {
-            background: rgba(255, 123, 0, 0.1);
-        }
-        
-        .user-avatar-small {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 14px;
-        }
-        
-        .user-info {
-            flex: 1;
-        }
-        
-        .user-name {
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .user-status {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
-        .user-status.online {
-            color: var(--success);
-        }
-        
-        .user-status.ingame {
-            color: var(--warning);
-        }
-        
-        .game-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .game-item:hover {
-            background: rgba(255, 123, 0, 0.1);
-        }
-        
-        .game-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 18px;
-        }
-        
-        .game-info {
-            flex: 1;
-        }
-        
-        .game-name {
-            font-weight: bold;
-            font-size: 14px;
-        }
-        
-        .game-stats {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-        
         /* Barra de rolagem personalizada */
         ::-webkit-scrollbar {
             width: 8px;
@@ -559,108 +351,29 @@
         }
         
         /* Responsividade */
-        @media (max-width: 1100px) {
-            .right-sidebar {
-                display: none;
-            }
-        }
-        
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                padding: 20px 10px;
+            .header {
+                padding: 15px 20px;
             }
             
-            .logo span, .nav-link span, .trending-topics {
-                display: none;
-            }
-            
-            .logo {
-                justify-content: center;
-                padding: 0 0 20px;
-            }
-            
-            .nav-link {
-                justify-content: center;
-                padding: 12px;
+            .page-title {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">
-                <i class="fas fa-gamepad"></i>
-                <span>BONFIRE GAMES</span>
-            </div>
-            
-            <div class="nav-links">
-                <a href="#" class="nav-link active">
-                    <i class="fas fa-home"></i>
-                    <span>Início</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-fire"></i>
-                    <span>Populares</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-bell"></i>
-                    <span>Notificações</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-envelope"></i>
-                    <span>Mensagens</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-bookmark"></i>
-                    <span>Salvos</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-user"></i>
-                    <span>Perfil</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Configurações</span>
-                </a>
-            </div>
-            
-            <div class="trending-topics">
-                <div class="trending-title">
-                    <i class="fas fa-hashtag"></i>
-                    <span>Tópicos em Alta</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-name">#NovoPatch</div>
-                    <div class="trending-stats">1.2K posts</div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-name">#DicasParaIniciantes</div>
-                    <div class="trending-stats">856 posts</div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-name">#EventoDeVerão</div>
-                    <div class="trending-stats">723 posts</div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-name">#ProblemasDeConexão</div>
-                    <div class="trending-stats">512 posts</div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <div class="page-title">Bonfirers Community</div>
+                <div class="page-title">
+                    <i class="fas fa-gamepad"></i>
+                    <span>BONFIRE GAMES</span>
+                </div>
                 <div class="header-actions">
                     <div class="header-icon">
                         <i class="fas fa-search"></i>
-                    </div>
-                    <div class="header-icon">
-                        <i class="fas fa-bell"></i>
                     </div>
                     <div class="user-avatar">
                         <i class="fas fa-user"></i>
@@ -891,118 +604,6 @@
                             <div class="post-stat">
                                 <i class="fas fa-share"></i>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right Sidebar -->
-        <div class="right-sidebar">
-            <div class="widget">
-                <div class="widget-title">
-                    <i class="fas fa-users"></i>
-                    <span>Online Agora</span>
-                </div>
-                <div class="online-users">
-                    <div class="user-item">
-                        <div class="user-avatar-small">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">pírola de açaí</div>
-                            <div class="user-status online">Online</div>
-                        </div>
-                    </div>
-                    <div class="user-item">
-                        <div class="user-avatar-small">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">GameMasterBR</div>
-                            <div class="user-status ingame">Jogando</div>
-                        </div>
-                    </div>
-                    <div class="user-item">
-                        <div class="user-avatar-small">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">ProGamer_2023</div>
-                            <div class="user-status ingame">Jogando</div>
-                        </div>
-                    </div>
-                    <div class="user-item">
-                        <div class="user-avatar-small">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">CosplayGamer</div>
-                            <div class="user-status online">Online</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="widget">
-                <div class="widget-title">
-                    <i class="fas fa-gamepad"></i>
-                    <span>Jogos Populares</span>
-                </div>
-                <div class="online-users">
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Stardew Valley</div>
-                            <div class="game-stats">1.2K jogando</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Minecraft</div>
-                            <div class="game-stats">2.4K jogando</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Terraria</div>
-                            <div class="game-stats">856 jogando</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Hollow Knight</div>
-                            <div class="game-stats">723 jogando</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="widget">
-                <div class="widget-title">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Eventos Próximos</span>
-                </div>
-                <div class="online-users">
-                    <div class="game-item">
-                        <div class="game-info">
-                            <div class="game-name">Torneio de Verão</div>
-                            <div class="game-stats">15 de Outubro</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-info">
-                            <div class="game-name">Live com Devs</div>
-                            <div class="game-stats">18 de Outubro</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-info">
-                            <div class="game-name">Festival de Cosplay</div>
-                            <div class="game-stats">22 de Outubro</div>
                         </div>
                     </div>
                 </div>
