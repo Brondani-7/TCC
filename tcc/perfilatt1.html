@@ -16,13 +16,13 @@
         body {
             background: #0e1a2b;
             color: #e1e7f0;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
         
         .container {
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             background: #0e1a2b;
@@ -37,7 +37,10 @@
             justify-content: space-between;
             border-bottom: 1px solid #1e3c72;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
         }
         
         .header-left {
@@ -49,16 +52,13 @@
             font-size: 24px;
             font-weight: bold;
             color: #ff7b00;
-            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .posts-count {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ff7b00;
-            background: rgba(255, 123, 0, 0.1);
-            padding: 6px 12px;
-            border-radius: 15px;
+        .logo-icon {
+            font-size: 26px;
         }
         
         .header-right {
@@ -66,88 +66,53 @@
             align-items: center;
             gap: 20px;
         }
-        .notification-link {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
 
-.notification-link:hover {
-    background-color: rgba(255, 123, 0, 0.1);
-}
+        .search-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
 
-.notification-link:hover .notification-icon {
-    color: #ff7b00;
-    transform: scale(1.1);
-} 
+        .search-link:hover {
+            background-color: rgba(255, 123, 0, 0.1);
+        }
 
-.search-link {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
+        .search-link:hover .search-icon {
+            color: #ff7b00;
+            transform: scale(1.1);
+        } 
 
-.search-link:hover {
-    background-color: rgba(255, 123, 0, 0.1);
-}
-
-.search-link:hover .search-icon {
-    color: #ff7b00;
-    transform: scale(1.1);
-} 
-
-        .search-icon, .notification-icon {
+        .search-icon {
             font-size: 18px;
             color: #8fa3c2;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .search-icon:hover, .notification-icon:hover {
-            color: #ff7b00;
-            transform: scale(1.1);
-        }
-        
-        .profile-container {
+        .profile-content {
             flex: 1;
-            overflow: hidden;
-            display: flex;
-            max-width: 1200px;
-            margin: 0 auto;
             width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0;
         }
         
-        .sidebar {
-            width: 250px;
-            padding: 20px;
-            background: #152642;
-            border-right: 1px solid #1e3c72;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
-        
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
+        .cover-section {
+            width: 100%;
+            position: relative;
+            margin-bottom: 0;
         }
         
         .cover {
-            height: 200px;
+            height: 250px;
             background: linear-gradient(135deg, #1e3c72 0%, #6a11cb 100%);
             position: relative;
-            border-radius: 0 0 10px 10px;
             overflow: visible;
-            flex-shrink: 0;
+            width: 100%;
         }
         
         .profile-pic {
@@ -157,69 +122,49 @@
             border: 4px solid #152642;
             background-color: #2a5298;
             position: absolute;
-            bottom: -50px;
-            left: 30px;
+            bottom: -60px;
+            left: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ff7b00;
-            font-size: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 50px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
             z-index: 10;
-            cursor: pointer;
-            transition: all 0.3s;
             overflow: hidden;
         }
         
-        .profile-pic:hover {
-            transform: scale(1.05);
-        }
-        
         .profile-info {
-            padding: 80px 30px 20px;
+            padding: 70px 40px 20px;
             background: #152642;
-            border-radius: 0 0 10px 10px;
-            margin-bottom: 20px;
+            margin-bottom: 0;
             position: relative;
             z-index: 5;
-            flex-shrink: 0;
+            width: 100%;
         }
         
-        .profile-actions {
+        .profile-header {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 20px;
         }
         
-        .edit-profile {
-            border: none;
-            color: white;
-            background: #ff7b00;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(255, 123, 0, 0.3);
-        }
-        
-        .edit-profile:hover {
-            background: #ff9a42;
-            transform: translateY(-2px);
+        .profile-text {
+            flex: 1;
         }
         
         .username {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             color: #ff7b00;
         }
         
         .handle {
             color: #8fa3c2;
-            margin-bottom: 15px;
-            font-size: 16px;
+            margin-bottom: 16px;
+            font-size: 15px;
         }
         
         .bio {
@@ -231,41 +176,21 @@
             background: rgba(30, 60, 114, 0.3);
             border-left: 3px solid #ff7b00;
             white-space: pre-line;
-        }
-        
-        .stats {
-            display: flex;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            background: rgba(30, 60, 114, 0.3);
-        }
-        
-        .stat {
-            margin-right: 30px;
-            color: #8fa3c2;
             font-size: 14px;
-            text-align: center;
-        }
-        
-        .stat span {
-            color: #ff7b00;
-            font-weight: bold;
-            font-size: 18px;
-            display: block;
+            max-width: 600px;
         }
         
         .badges {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             margin-top: 15px;
         }
         
         .badge {
             background: linear-gradient(135deg, #ff9a42 0%, #ff7b54 100%);
             color: white;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: bold;
@@ -273,32 +198,32 @@
         
         .tabs-container {
             background: #152642;
-            padding: 0 30px;
+            padding: 0 40px;
             border-bottom: 1px solid #1e3c72;
-            flex-shrink: 0;
+            width: 100%;
         }
         
         .tabs {
             display: flex;
-            height: 50px;
+            height: 60px;
+            width: 100%;
+            max-width: none;
+            align-items: center;
+            gap: 0;
         }
         
         .tab {
-            flex: 1;
+            padding: 0 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 18px;
             font-weight: bold;
             color: #8fa3c2;
             cursor: pointer;
-            transition: all 0.3s;
             position: relative;
-        }
-        
-        .tab:hover {
-            color: #ff7b00;
-            background: rgba(255, 123, 0, 0.1);
+            height: 100%;
+            min-width: 120px;
         }
         
         .tab.active {
@@ -309,52 +234,62 @@
             content: '';
             position: absolute;
             bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 80%;
-            height: 3px;
+            height: 4px;
             background: #ff7b00;
             border-radius: 2px;
         }
         
         .posts-container {
-            padding: 20px 30px;
+            padding: 20px 40px;
             background: #0e1a2b;
-            flex: 1;
-            overflow-y: visible;
+            min-height: 400px;
+            width: 100%;
+        }
+        
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            width: 100%;
+            max-width: none;
         }
         
         .post {
-            padding: 20px;
+            padding: 28px;
             background: #152642;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: all 0.3s;
             border: 1px solid #1e3c72;
+            width: 100%;
         }
         
         .post:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
             border-color: #ff7b00;
         }
         
         .post-header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 18px;
         }
         
         .post-avatar {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: #2a5298;
-            margin-right: 12px;
+            margin-right: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ff7b00;
-            font-size: 18px;
+            font-size: 22px;
             overflow: hidden;
             flex-shrink: 0;
             position: relative;
@@ -363,93 +298,39 @@
         .post-user {
             font-weight: bold;
             color: #ff7b00;
+            font-size: 17px;
         }
         
         .post-handle {
             color: #8fa3c2;
-            margin-left: 8px;
+            margin-left: 10px;
+            font-size: 15px;
         }
         
         .post-date {
             color: #8fa3c2;
-            margin-left: 8px;
+            margin-left: 10px;
+            font-size: 14px;
         }
         
         .post-content {
-            margin-left: 52px;
+            margin-left: 63px;
         }
         
         .post-reply {
             color: #8fa3c2;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 14px;
         }
         
         .post-text {
-            line-height: 1.5;
+            line-height: 1.6;
             color: #e1e7f0;
-        }
-        
-        .sidebar-section {
-            background: #152642;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #1e3c72;
-        }
-        
-        .sidebar-title {
             font-size: 16px;
-            font-weight: bold;
-            color: #ff7b00;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #1e3c72;
-        }
-        
-        .game-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        
-        .game-item:hover {
-            background: rgba(255, 123, 0, 0.1);
-        }
-        
-        .game-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #2a5298;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ff7b00;
-            font-size: 18px;
-        }
-        
-        .game-info {
-            flex: 1;
-        }
-        
-        .game-name {
-            font-weight: bold;
-            color: #e1e7f0;
-            font-size: 14px;
-        }
-        
-        .game-stats {
-            color: #8fa3c2;
-            font-size: 12px;
         }
         
         .profile-icon {
-            font-size: 50px;
+            font-size: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -479,171 +360,6 @@
             background: #ff9a42;
         }
         
-        .sidebar-stats {
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-        }
-        
-        .sidebar-stat {
-            flex: 1;
-            color: #8fa3c2;
-            font-size: 12px;
-            padding: 0 5px;
-        }
-        
-        .sidebar-stat span {
-            color: #ff7b00;
-            font-weight: bold;
-            font-size: 16px;
-            display: block;
-        }
-        
-        /* Modal de Edição */
-        .edit-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(14, 26, 43, 0.95);
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-        
-        .edit-modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #152642;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            border: 2px solid #1e3c72;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        
-        .edit-modal h2 {
-            color: #ff7b00;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 24px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            color: #8fa3c2;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            background: #0e1a2b;
-            border: 1px solid #1e3c72;
-            border-radius: 8px;
-            color: #e1e7f0;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #ff7b00;
-            box-shadow: 0 0 0 2px rgba(255, 123, 0, 0.2);
-        }
-        
-        .form-group textarea {
-            height: 100px;
-            resize: vertical;
-        }
-        
-        .icon-selection {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .icon-option {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #2a5298;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        
-        .icon-option:hover {
-            transform: scale(1.1);
-            border-color: #ff7b00;
-        }
-        
-        .icon-option.selected {
-            border-color: #ff7b00;
-            background: #1e3c72;
-        }
-        
-        .photo-option {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            font-size: 18px;
-        }
-        
-        .photo-option:hover {
-            background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        .save-btn, .cancel-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .save-btn {
-            background: #ff7b00;
-            color: white;
-        }
-        
-        .save-btn:hover {
-            background: #ff9a42;
-            transform: translateY(-2px);
-        }
-        
-        .cancel-btn {
-            background: #1e3c72;
-            color: #8fa3c2;
-        }
-        
-        .cancel-btn:hover {
-            background: #2a5298;
-            color: #e1e7f0;
-        }
-        
         /* CORREÇÕES CRÍTICAS PARA IMAGENS */
         .profile-pic img,
         .post-avatar img {
@@ -667,18 +383,58 @@
             display: block;
         }
         
-        .photo-option .fa-check {
-            color: white;
-            font-size: 18px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
         .profile-pic,
         .post-avatar {
             position: relative;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 20px;
+            }
+            
+            .cover {
+                height: 180px;
+            }
+            
+            .profile-pic {
+                width: 90px;
+                height: 90px;
+                bottom: -45px;
+                left: 20px;
+                font-size: 35px;
+            }
+            
+            .profile-info {
+                padding: 55px 20px 15px;
+            }
+            
+            .username {
+                font-size: 20px;
+            }
+            
+            .handle {
+                font-size: 13px;
+            }
+            
+            .posts-container {
+                padding: 15px 20px;
+            }
+            
+            .tabs-container {
+                padding: 0 20px;
+            }
+            
+            .post {
+                padding: 22px;
+            }
+            
+            .tab {
+                padding: 0 25px;
+                font-size: 16px;
+                min-width: 100px;
+            }
         }
     </style>
 </head>
@@ -686,66 +442,20 @@
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <div class="logo">BONFIRE GAMES</div>
+                <div class="logo">
+                    <i class="fas fa-gamepad logo-icon"></i>
+                    <span>BONFIRE GAMES</span>
+                </div>
             </div>
             <div class="header-right">
-    <a href="pesquisa.html" class="search-link">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-    </a>
-    <a href="notificacoes.html" class="notification-link">
-        <i class="fa-solid fa-bell notification-icon"></i>
-    </a>
-</div>
+                <a href="pesquisa.html" class="search-link">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                </a>
+            </div>
         </div>
 
-        <div class="profile-container">
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Jogos Favoritos</div>
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Stardew Valley</div>
-                            <div class="game-stats">120 horas</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Minecraft</div>
-                            <div class="game-stats">85 horas</div>
-                        </div>
-                    </div>
-                    <div class="game-item">
-                        <div class="game-icon">🎮</div>
-                        <div class="game-info">
-                            <div class="game-name">Terraria</div>
-                            <div class="game-stats">64 horas</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Conquistas</div>
-                    <div class="badges">
-                        <div class="badge">Jogador Ativo</div>
-                        <div class="badge">Colecionador</div>
-                        <div class="badge">Explorador</div>
-                        <div class="badge">Construtor</div>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Estatísticas</div>
-                    <div class="sidebar-stats">
-                        <div class="sidebar-stat"><span>42</span>Jogos</div>
-                        <div class="sidebar-stat"><span>1.2k</span>Seguidores</div>
-                        <div class="sidebar-stat"><span>38</span>Seguindo</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="main-content">
+        <div class="profile-content">
+            <div class="cover-section">
                 <div class="cover">
                     <div class="profile-pic" id="profilePicture">
                         <div class="profile-icon" id="profileIcon">🔥</div>
@@ -753,37 +463,37 @@
                 </div>
                 
                 <div class="profile-info">
-                    <div class="profile-actions">
-                        <button class="edit-profile" id="editProfileBtn">Editar perfil</button>
-                    </div>
-                    
-                    <div class="username" id="displayUsername">guilindo123</div>
-                    <div class="handle" id="displayHandle">@sukunayukitenkai_</div>
-                    
-                    <div class="bio" id="displayBio">
-                        sonic autist ●<br>
-                        - casa das primas ○ (Nadoão) em 8 de janeiro de 2008<br>
-                        - ingressou em julho de 2023
-                    </div>
-                    
-                    <div class="stats">
-                        <div class="stat"><span>38</span> Seguindo</div>
-                        <div class="stat"><span>17</span> Seguidores</div>
-                        <div class="stat"><span>42</span> Jogos</div>
-                    </div>
-                </div>
-                
-                <div class="tabs-container">
-                    <div class="tabs">
-                        <div class="tab active">Posts</div>
-                        <div class="tab">Jogos</div>
-                        <div class="tab">Mídia</div>
-                        <div class="tab">Conquistas</div>
-                        <div class="tab">Criações</div>
+                    <div class="profile-header">
+                        <div class="profile-text">
+                            <div class="username" id="displayUsername">guilindo123</div>
+                            <div class="handle" id="displayHandle">@sukunayukitenkai_</div>
+                            
+                            <div class="bio" id="displayBio">
+                                sonic autist ●<br>
+                                - casa das primas ○ (Nadoão) em 8 de janeiro de 2008<br>
+                                - ingressou em julho de 2023
+                            </div>
+                            
+                            <div class="badges">
+                                <div class="badge">Jogador Ativo</div>
+                                <div class="badge">Colecionador</div>
+                                <div class="badge">Explorador</div>
+                                <div class="badge">Construtor</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="posts-container">
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div class="tab active">Posts</div>
+                    <div class="tab">Criações</div>
+                </div>
+            </div>
+            
+            <div class="posts-container">
+                <div class="posts-list">
                     <div class="post">
                         <div class="post-header">
                             <div class="post-avatar" id="postAvatar">
@@ -813,7 +523,6 @@
                         </div>
                     </div>
                     
-                    <!-- Adicionei mais posts para demonstrar a rolagem -->
                     <div class="post">
                         <div class="post-header">
                             <div class="post-avatar" id="postAvatar3">
@@ -824,7 +533,7 @@
                             <div class="post-date">· 3 de out</div>
                         </div>
                         <div class="post-content">
-                            <div class="post-text">Jogando Stardew Valley novamente, essa semana!</div>
+                            <div class="post-text">Jogando Stardew Valley novamente, essa semana! Consegui expandir minha fazenda e agora tenho animais. Alguém tem dicas para cuidar melhor dos porquinhos?</div>
                         </div>
                     </div>
                     
@@ -838,7 +547,21 @@
                             <div class="post-date">· 1 de out</div>
                         </div>
                         <div class="post-content">
-                            <div class="post-text">Alguém mais animado para o novo update do Minecraft?</div>
+                            <div class="post-text">Alguém mais animado para o novo update do Minecraft? As novas caves são incríveis! Já explorei algumas e encontrei recursos raros que nem sabia que existiam no jogo.</div>
+                        </div>
+                    </div>
+
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar" id="postAvatar5">
+                                <div class="profile-icon">🔥</div>
+                            </div>
+                            <div class="post-user" id="postUsername5">guilindo123</div>
+                            <div class="post-handle" id="postHandle5">@sukunayukitenkai_</div>
+                            <div class="post-date">· 28 de set</div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-text">Acabei de terminar minha primeira build no modo criativo - um castelo medieval com ponte levadiça funcional usando redstone. Foi desafiador mas valeu a pena!</div>
                         </div>
                     </div>
                 </div>
@@ -846,102 +569,30 @@
         </div>
     </div>
 
-    <!-- Modal de Edição -->
-    <div class="edit-modal" id="editModal">
-        <div class="edit-modal-content">
-            <h2>Editar Perfil</h2>
-            
-            <div class="form-group">
-                <label for="username">Nome de usuário</label>
-                <input type="text" id="username" value="guilindo123">
-            </div>
-            
-            <div class="form-group">
-                <label for="handle">@</label>
-                <input type="text" id="handle" value="sukunayukitenkai_">
-            </div>
-            
-            <div class="form-group">
-                <label for="bio">Biografia</label>
-                <textarea id="bio">sonic autist ●
-- casa das primas ○ (Nadoão) em 8 de janeiro de 2008
-- ingressou em julho de 2023</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Ícone do perfil</label>
-                <div class="icon-selection">
-                    <div class="icon-option" data-icon="🔥">🔥</div>
-                    <div class="icon-option" data-icon="🎮">🎮</div>
-                    <div class="icon-option" data-icon="⚔️">⚔️</div>
-                    <div class="icon-option" data-icon="👻">👻</div>
-                    <div class="icon-option photo-option" data-icon="photo">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="cancel-btn" id="cancelEdit">Cancelar</button>
-                <button class="save-btn" id="saveProfile">Salvar</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-
-
-        // Elementos do DOM
-        const editProfileBtn = document.getElementById('editProfileBtn');
-        const editModal = document.getElementById('editModal');
-        const cancelEdit = document.getElementById('cancelEdit');
-        const saveProfile = document.getElementById('saveProfile');
-        
-        // Elementos do perfil
-        const usernameInput = document.getElementById('username');
-        const handleInput = document.getElementById('handle');
-        const bioInput = document.getElementById('bio');
-        const iconOptions = document.querySelectorAll('.icon-option');
-        
-        // Elementos de exibição
-        const displayUsername = document.getElementById('displayUsername');
-        const displayHandle = document.getElementById('displayHandle');
-        const displayBio = document.getElementById('displayBio');
-        const profileIcon = document.getElementById('profileIcon');
-        const profilePicture = document.getElementById('profilePicture');
-
-        // Ícone selecionado e foto
-        let selectedIcon = '🔥';
-        let uploadedPhoto = null;
-
-        // Criar input de arquivo
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.className = 'file-input';
-        document.body.appendChild(fileInput);
+        // Carregar dados salvos
+        function loadProfileData() {
+            const savedData = localStorage.getItem('profileData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('displayUsername').textContent = data.username;
+                document.getElementById('displayHandle').textContent = `@${data.handle}`;
+                document.getElementById('displayBio').innerHTML = data.bio.replace(/\n/g, '<br>');
+                
+                // Atualizar foto ou ícone em TODOS os lugares
+                updateAllProfileImages(data.photo, data.icon);
+            }
+        }
 
         // Função para atualizar TODOS os avatares
         function updateAllProfileImages(photo, icon) {
             // Atualizar foto principal do perfil
-            updateProfileImage(profilePicture, photo, icon);
+            updateProfileImage(document.getElementById('profilePicture'), photo, icon);
             
             // Atualizar TODOS os avatares dos posts
             const allPostAvatars = document.querySelectorAll('.post-avatar');
             allPostAvatars.forEach(avatar => {
                 updateProfileImage(avatar, photo, icon);
-            });
-            
-            // Atualizar TODOS os nomes de usuário e handles
-            const allPostUsernames = document.querySelectorAll('.post-user');
-            const allPostHandles = document.querySelectorAll('.post-handle');
-            
-            allPostUsernames.forEach(username => {
-                username.textContent = usernameInput.value;
-            });
-            
-            allPostHandles.forEach(handle => {
-                handle.textContent = `@${handleInput.value}`;
             });
         }
 
@@ -970,125 +621,6 @@
             }
         }
 
-        // Carregar dados salvos
-        function loadProfileData() {
-            const savedData = localStorage.getItem('profileData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                displayUsername.textContent = data.username;
-                displayHandle.textContent = `@${data.handle}`;
-                displayBio.innerHTML = data.bio.replace(/\n/g, '<br>');
-                
-                // Atualizar foto ou ícone em TODOS os lugares
-                updateAllProfileImages(data.photo, data.icon);
-                
-                uploadedPhoto = data.photo;
-                selectedIcon = data.icon;
-                
-                // Preencher formulário
-                usernameInput.value = data.username;
-                handleInput.value = data.handle;
-                bioInput.value = data.bio;
-                
-                // Selecionar ícone correto
-                iconOptions.forEach(option => {
-                    if (option.dataset.icon === data.icon) {
-                        option.classList.add('selected');
-                    }
-                });
-            }
-        }
-
-        // Abrir modal de edição
-        editProfileBtn.addEventListener('click', () => {
-            editModal.style.display = 'block';
-        });
-
-        // Fechar modal
-        cancelEdit.addEventListener('click', () => {
-            editModal.style.display = 'none';
-        });
-
-        // Selecionar ícone
-        iconOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                if (option.classList.contains('photo-option')) {
-                    // Abrir seletor de arquivos para foto
-                    fileInput.click();
-                } else {
-                    iconOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    selectedIcon = option.dataset.icon;
-                    uploadedPhoto = null; // Resetar foto quando selecionar ícone
-                }
-            });
-        });
-
-        // Lidar com seleção de arquivo
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedPhoto = e.target.result;
-                    
-                    // Desselecionar todos os ícones
-                    iconOptions.forEach(opt => opt.classList.remove('selected'));
-                    
-                    // Feedback visual
-                    const photoOption = document.querySelector('.photo-option');
-                    photoOption.innerHTML = '<i class="fas fa-check"></i>';
-                    photoOption.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                    
-                    setTimeout(() => {
-                        photoOption.innerHTML = '<i class="fas fa-camera"></i>';
-                        photoOption.style.background = 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)';
-                    }, 2000);
-                }
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-
-        // Salvar perfil
-        saveProfile.addEventListener('click', () => {
-            const profileData = {
-                username: usernameInput.value,
-                handle: handleInput.value,
-                bio: bioInput.value,
-                icon: selectedIcon,
-                photo: uploadedPhoto
-            };
-            
-            // Salvar no localStorage
-            localStorage.setItem('profileData', JSON.stringify(profileData));
-            
-            // Atualizar exibição
-            displayUsername.textContent = profileData.username;
-            displayHandle.textContent = `@${profileData.handle}`;
-            displayBio.innerHTML = profileData.bio.replace(/\n/g, '<br>');
-            
-            // Atualizar foto ou ícone em TODOS os lugares
-            updateAllProfileImages(profileData.photo, profileData.icon);
-            
-            // Fechar modal
-            editModal.style.display = 'none';
-            
-            // Feedback visual
-            saveProfile.textContent = 'Salvo! ✓';
-            setTimeout(() => {
-                saveProfile.textContent = 'Salvar';
-            }, 2000);
-        });
-
-        // Fechar modal clicando fora
-        window.addEventListener('click', (e) => {
-            if (e.target === editModal) {
-                editModal.style.display = 'none';
-            }
-        });
-
-        // Carregar dados ao iniciar
-        document.addEventListener('DOMContentLoaded', loadProfileData);
-
         // Interatividade das abas
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -1096,6 +628,9 @@
                 this.classList.add('active');
             });
         });
+
+        // Carregar dados ao iniciar
+        document.addEventListener('DOMContentLoaded', loadProfileData);
     </script>
 </body>
 </html>
