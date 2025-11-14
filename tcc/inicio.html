@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonfire Games - Descubra Jogos Indie</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset e variáveis CSS */
+        :root {
+            /* MODO CLARO - Tons de Roxo */
+            --primary-color: #7459B3;
+            --secondary-color: #D976C0;
+            --dark-bg: #E0E0E0;
+            --darker-bg: #F5F5F5;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --border: #CCCCCC;
+            --card-bg: #FFFFFF;
+            
+            /* MODO ESCURO - Tons de Roxo Vibrante */
+            --dark-primary: #BD5BFF;
+            --dark-secondary: #9F6992;
+            --dark-bg-dark: #333641;
+            --dark-darker-bg: #2A2B35;
+            --dark-text: #FFFFFF;
+            --dark-text-secondary: #BBBBBB;
+            --dark-border: #444444;
+            --dark-card-bg: #3A3B45;
+        }
+        
+        /* Estilos para tema escuro */
+        body.dark-theme {
+            --primary-color: var(--dark-primary);
+            --secondary-color: var(--dark-secondary);
+            --dark-bg: var(--dark-bg-dark);
+            --darker-bg: var(--dark-darker-bg);
+            --text-color: var(--dark-text);
+            --text-secondary: var(--dark-text-secondary);
+            --border: var(--dark-border);
+            --card-bg: var(--dark-card-bg);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Layout principal */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar COM BORDA DIREITA */
+        .sidebar {
+            width: 250px;
+            background: var(--darker-bg);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border);
+        }
+        
+        /* Perfil no TOPO */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-section:hover {
+            background: rgba(116, 89, 179, 0.1);
+            border-radius: 8px;
+        }
+        
+        body.dark-theme .profile-section:hover {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .profile-info {
+            width: 100%;
+        }
+        
+        .profile-name {
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-username {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .topics-section {
+            padding: 0 10px;
+        }
+        
+        .topic-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+            text-decoration: none;
+        }
+        
+        .topic-item:hover, .topic-item.active {
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.1);
+        }
+        
+        body.dark-theme .topic-item:hover, 
+        body.dark-theme .topic-item.active {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .topic-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+        }
+        
+        /* Conteúdo principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(217, 118, 192, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(116, 89, 179, 0.1) 0%, transparent 50%),
+                linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .main-content {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(159, 105, 146, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(189, 91, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(to bottom, var(--dark-darker-bg), var(--dark-bg-dark));
+        }
+        
+        /* Header COM BORDA INFERIOR */
+        .header {
+            background: var(--darker-bg);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        /* Conteúdo da página inicial */
+        .home-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Seção de destaques */
+        .highlights {
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--text-color);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), transparent);
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-image {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        
+        .game-info {
+            padding: 15px;
+        }
+        
+        .game-title {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .game-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .game-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .game-tag {
+            background-color: rgba(116, 89, 179, 0.2);
+            color: var(--primary-color);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        body.dark-theme .game-tag {
+            background-color: rgba(189, 91, 255, 0.2);
+        }
+        
+        /* Footer COM BORDA SUPERIOR */
+        footer {
+            background-color: var(--darker-bg);
+            padding: 40px 20px;
+            margin-top: 60px;
+            transition: all 0.3s ease;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .footer-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(116, 89, 179, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        body.dark-theme .social-link {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .social-link:hover {
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        body.dark-theme .social-link:hover {
+            background: rgba(189, 91, 255, 0.2);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.1);
+        }
+        
+        body.dark-theme .footer-links a:hover {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+            padding-top: 20px;
+            width: 100%;
+        }
+        
+        /* Botão de tema - CORRIGIDO */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(116, 89, 179, 0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        body.dark-theme .theme-toggle {
+            box-shadow: 0 4px 15px rgba(189, 91, 255, 0.3);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(116, 89, 179, 0.5);
+        }
+        
+        body.dark-theme .theme-toggle:hover {
+            box-shadow: 0 6px 20px rgba(189, 91, 255, 0.5);
+        }
+        
+        /* Barra de rolagem personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+            
+            .profile-name, .profile-username, .profile-stats, .topic-item span {
+                display: none;
+            }
+            
+            .profile-section {
+                padding: 10px 5px;
+                align-items: center;
+            }
+            
+            .profile-pic {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                margin-bottom: 0;
+            }
+            
+            .topic-item {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .topic-item i {
+                margin-right: 0;
+            }
+            
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .footer-main {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Perfil no TOPO -->
+            <div class="profile-section" id="profile-icon">
+                <div class="profile-pic">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name">Alex Silva</div>
+                    <div class="profile-username">@alexsilva</div>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-value">125</span>
+                            <span class="stat-label">seguidores</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">42</span>
+                            <span class="stat-label">seguindo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="topics-section">
+                <!-- Tópicos com links funcionais -->
+                <a href="inicio.html" class="topic-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Início</span>
+                </a>
+                <a href="fangames.html" class="topic-item">
+                    <i class="fas fa-fire"></i>
+                    <span>Fangames</span>
+                </a>
+                <a href="forumatt.html" class="topic-item">
+                    <i class="fas fa-users"></i>
+                    <span>Comunidade</span>
+                </a>
+                <a href="pesquisa.html" class="topic-item">
+                    <i class="fas fa-search"></i>
+                    <span>Pesquisar</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-fire"></i>
+                </div>
+            </div>
+            
+            <div class="home-content">
+                <div class="highlights">
+                    <h2 class="section-title">Jogos em Destaque</h2>
+                    <div class="games-grid">
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-ghost"></i>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">Hollow Knight</h3>
+                                <p class="game-description">Uma aventura de ação épica em um reino arruinado de insetos e heróis.</p>
+                                <div class="game-tags">
+                                    <span class="game-tag">Metroidvania</span>
+                                    <span class="game-tag">Indie</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-mountain"></i>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">Celeste</h3>
+                                <p class="game-description">Uma jornada sobre escalar uma montanha e superar seus demônios internos.</p>
+                                <div class="game-tags">
+                                    <span class="game-tag">Plataforma</span>
+                                    <span class="game-tag">Indie</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">Stardew Valley</h3>
+                                <p class="game-description">Um RPG de simulação de vida no campo onde você cultiva, cria animais e faz amigos.</p>
+                                <div class="game-tags">
+                                    <span class="game-tag">Simulação</span>
+                                    <span class="game-tag">RPG</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">Undertale</h3>
+                                <p class="game-description">Um RPG onde você não precisa matar ninguém. Suas ações mudam o mundo.</p>
+                                <div class="game-tags">
+                                    <span class="game-tag">RPG</span>
+                                    <span class="game-tag">Indie</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">Sonic Utopia</h3>
+                                <p class="game-description">Fangame de Sonic em mundo aberto com física avançada e exploração livre.</p>
+                                <div class="game-tags">
+                                    <span class="game-tag">Plataforma</span>
+                                    <span class="game-tag">3D</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-dragon"></i>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">AM2R</h3>
+                                <p class="game-description">Remake fiel de Metroid II com gráficos atualizados e jogabilidade refinada.</p>
+                                <div class="game-tags">
+                                    <span class="game-tag">Metroidvania</span>
+                                    <span class="game-tag">Remake</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <div class="footer-content">
+                    <div class="footer-main">
+                        <div class="social-links">
+                            <a href="#" class="social-link">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="footer-links">
+                            <a href="#">Relatar Problemas</a>
+                            <a href="#">Contato</a>
+                        </div>
+                    </div>
+                    
+                    <div class="copyright">
+                        &copy; 2025 Bonfire Games. Todos os direitos reservados.
+                    </div>
+                </div>
+            </footer>
+        </div>
+        
+        <!-- Botão de tema - CORRIGIDO: Tema escuro = Sol, Tema claro = Lua -->
+        <div class="theme-toggle">
+            <i class="fas fa-sun"></i>
+        </div>
+    </div>
+
+    <script>
+        // Navegação entre páginas (simulação)
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Em uma implementação real, isso redirecionaria para a página do jogo
+                alert('Redirecionando para a página do jogo...');
+            });
+        });
+        
+        // Redirecionamento para perfil apenas quando clica no ícone
+        document.getElementById('profile-icon').addEventListener('click', function() {
+            window.location.href = 'perfilatt1.html';
+        });
+        
+        // Alternar tema - TOTALMENTE CORRIGIDO
+        const themeToggle = document.querySelector('.theme-toggle');
+        
+        themeToggle.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            const body = document.body;
+            
+            if(body.classList.contains('dark-theme')) {
+                // Mudar para tema CLARO (sol -> lua)
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                body.classList.remove('dark-theme');
+            } else {
+                // Mudar para tema ESCURO (lua -> sol)
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                body.classList.add('dark-theme');
+            }
+        });
+
+        // Destacar tópico ativo baseado na página atual
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop() || 'inicio.html';
+            const topicItems = document.querySelectorAll('.topic-item');
+            
+            topicItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
