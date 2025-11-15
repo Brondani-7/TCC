@@ -28,4 +28,5 @@ function getCurrentUser($pdo) {
     $stmt->execute([$_SESSION['customer_id']]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
 ?>
