@@ -794,23 +794,16 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <i class="fas fa-users"></i>
                     <span>Fórum</span>
                 </a>
-                <a href="profile.php" class="nav-link active">
-                    <i class="fas fa-user"></i>
-                    <span>Perfil</span>
-                </a>
             </div>
         </div>
         
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <div class="page-title">Meu Perfil</div>
+                <div class="page-title">Perfil</div>
                 <div class="header-actions">
                     <div class="header-icon">
                         <i class="fas fa-search"></i>
-                    </div>
-                    <div class="header-icon">
-                        <i class="fas fa-bell"></i>
                     </div>
                     <div class="user-avatar" style="background-image: url('<?php echo !empty($user['ProfilePhoto']) ? $user['ProfilePhoto'] : ''; ?>')">
                         <?php echo empty($user['ProfilePhoto']) ? '<i class="fas fa-user"></i>' : ''; ?>
