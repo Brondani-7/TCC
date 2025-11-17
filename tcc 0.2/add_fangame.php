@@ -583,7 +583,7 @@ $totalPages = ceil($totalFangames / $limit);
                     <span>Fórum</span>
                 </a>
                 <?php if ($user): ?>
-                <a href="profile.php" class="nav-link">
+                <a href="perfil.php" class="nav-link">
                     <i class="fas fa-user"></i>
                     <span>Perfil</span>
                 </a>
