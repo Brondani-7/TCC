@@ -157,12 +157,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['q'])) {
         <div class="menu-logo">BONFIRE GAMES</div>
         <nav class="menu-nav">
             <ul>
-                <li><a href="index.php">Firelink</a></li>
+                <li><a href="index.php">inicio</a></li>
                 <li><a href="fangames.php">Fansgames</a></li>
-                <li><a href="forum.php">Bonfires</a></li>
-                <li><a href="#">Sobre</a></li>
+                <li><a href="forum.php">foruns</a></li>    
                 <?php if (isLoggedIn()): ?>
-                    <li><a href="perfil.php">Meu Perfil</a></li>
+                    <li><a href="perfil.php">Perfil</a></li>
                     <li><a href="logout.php">Sair</a></li>
                 <?php else: ?>
                     <li><a href="login.php">Login</a></li>
