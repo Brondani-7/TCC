@@ -1,102 +1,236 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pesquisa - Bonfire Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Reset e variáveis CSS */
+        :root {
+            /* MODO CLARO - Tons de Roxo */
+            --primary-color: #7459B3;
+            --secondary-color: #D976C0;
+            --dark-bg: #E0E0E0;
+            --darker-bg: #F5F5F5;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --border: #CCCCCC;
+            --card-bg: #FFFFFF;
+            
+            /* MODO ESCURO - Tons de Roxo Vibrante */
+            --dark-primary: #BD5BFF;
+            --dark-secondary: #9F6992;
+            --dark-bg-dark: #333641;
+            --dark-darker-bg: #2A2B35;
+            --dark-text: #FFFFFF;
+            --dark-text-secondary: #BBBBBB;
+            --dark-border: #444444;
+            --dark-card-bg: #3A3B45;
+        }
+        
+        /* Estilos para tema escuro */
+        body.dark-theme {
+            --primary-color: var(--dark-primary);
+            --secondary-color: var(--dark-secondary);
+            --dark-bg: var(--dark-bg-dark);
+            --darker-bg: var(--dark-darker-bg);
+            --text-color: var(--dark-text);
+            --text-secondary: var(--dark-text-secondary);
+            --border: var(--dark-border);
+            --card-bg: var(--dark-card-bg);
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: #0e1a2b;
-            color: #e1e7f0;
+            background: var(--dark-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Layout principal */
+        .container {
+            display: flex;
             min-height: 100vh;
         }
         
-        .container {
-            width: 100%;
-            min-height: 100vh;
+        /* Sidebar COM BORDA DIREITA */
+        .sidebar {
+            width: 250px;
+            background: var(--darker-bg);
+            padding: 20px 0;
             display: flex;
             flex-direction: column;
-            background: #0e1a2b;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border);
         }
         
-        .header {
-            background: #152642;
-            height: 70px;
-            padding: 0 30px;
+        /* Perfil no TOPO */
+        .profile-section {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #1e3c72;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff7b00;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .notification-icon, .profile-icon {
-            font-size: 18px;
-            color: #8fa3c2;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+            margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .profile-link, .notification-link {
-            text-decoration: none;
+        .profile-section:hover {
+            background: rgba(116, 89, 179, 0.1);
+            border-radius: 8px;
+        }
+        
+        body.dark-theme .profile-section:hover {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--secondary-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            padding: 8px;
+            color: white;
+            font-size: 30px;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary-color);
         }
         
-        .profile-link:hover, .notification-link:hover {
-            background-color: rgba(255, 123, 0, 0.1);
+        .profile-info {
+            width: 100%;
         }
         
-        .profile-pic-small {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #2a5298;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ff7b00;
+        .profile-name {
+            font-weight: bold;
+            color: var(--text-color);
             font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-username {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .topics-section {
+            padding: 0 10px;
+        }
+        
+        .topic-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+            text-decoration: none;
+        }
+        
+        .topic-item:hover, .topic-item.active {
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.1);
+        }
+        
+        body.dark-theme .topic-item:hover, 
+        body.dark-theme .topic-item.active {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .topic-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+        }
+        
+        /* Conteúdo principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(217, 118, 192, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(116, 89, 179, 0.1) 0%, transparent 50%),
+                linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .main-content {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(159, 105, 146, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(189, 91, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(to bottom, var(--dark-darker-bg), var(--dark-bg-dark));
+        }
+        
+        /* Header COM BORDA INFERIOR */
+        .header {
+            background: var(--darker-bg);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        /* Conteúdo da página de pesquisa */
+        .search-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         /* Search Header */
         .search-header {
-            background: #0e1a2b;
-            padding: 40px 30px 20px;
-            border-bottom: 1px solid #1e3c72;
-            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px 0;
+            margin-bottom: 30px;
         }
         
         .search-container {
@@ -113,18 +247,22 @@
         .search-input {
             width: 100%;
             padding: 18px 60px 18px 25px;
-            background: #152642;
-            border: 2px solid #1e3c72;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
             border-radius: 30px;
-            color: #e1e7f0;
+            color: var(--text-color);
             font-size: 16px;
             transition: all 0.3s;
         }
         
         .search-input:focus {
             outline: none;
-            border-color: #ff7b00;
-            box-shadow: 0 0 0 3px rgba(255, 123, 0, 0.2);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(116, 89, 179, 0.2);
+        }
+        
+        body.dark-theme .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(189, 91, 255, 0.2);
         }
         
         .search-button {
@@ -132,7 +270,7 @@
             right: 10px;
             top: 50%;
             transform: translateY(-50%);
-            background: #ff7b00;
+            background: var(--primary-color);
             border: none;
             border-radius: 50%;
             width: 45px;
@@ -146,7 +284,7 @@
         }
         
         .search-button:hover {
-            background: #ff9a42;
+            background: var(--secondary-color);
         }
 
         /* Dropdown do Pinterest */
@@ -155,11 +293,11 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: #152642;
-            border: 1px solid #1e3c72;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: 16px;
             margin-top: 10px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             z-index: 1000;
             display: none;
             overflow: hidden;
@@ -171,7 +309,7 @@
 
         .dropdown-section {
             padding: 20px;
-            border-bottom: 1px solid #1e3c72;
+            border-bottom: 1px solid var(--border);
         }
 
         .dropdown-section:last-child {
@@ -181,7 +319,7 @@
         .section-title {
             font-size: 14px;
             font-weight: bold;
-            color: #ff7b00;
+            color: var(--primary-color);
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -205,12 +343,17 @@
         }
 
         .suggestion-item:hover, .history-item:hover {
-            background: rgba(255, 123, 0, 0.1);
+            background: rgba(116, 89, 179, 0.1);
+        }
+        
+        body.dark-theme .suggestion-item:hover, 
+        body.dark-theme .history-item:hover {
+            background: rgba(189, 91, 255, 0.1);
         }
 
         .suggestion-icon, .history-icon {
             margin-right: 12px;
-            color: #8fa3c2;
+            color: var(--text-secondary);
             font-size: 16px;
             width: 20px;
             text-align: center;
@@ -218,14 +361,14 @@
 
         .suggestion-text, .history-text {
             flex: 1;
-            color: #e1e7f0;
+            color: var(--text-color);
             font-size: 15px;
         }
 
         .delete-history {
             background: none;
             border: none;
-            color: #8fa3c2;
+            color: var(--text-secondary);
             cursor: pointer;
             padding: 4px;
             border-radius: 4px;
@@ -247,7 +390,7 @@
             padding: 12px;
             background: none;
             border: none;
-            color: #8fa3c2;
+            color: var(--text-secondary);
             cursor: pointer;
             font-size: 14px;
             border-radius: 8px;
@@ -256,8 +399,38 @@
         }
 
         .clear-all:hover {
-            color: #ff7b00;
-            background: rgba(255, 123, 0, 0.1);
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.1);
+        }
+        
+        body.dark-theme .clear-all:hover {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
         
         /* Pinterest Style Grid */
@@ -265,45 +438,36 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
-            padding: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 1200px;
             align-items: start;
         }
         
         .pin-card {
-            background: #152642;
-            border-radius: 16px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
             overflow: hidden;
             transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            border: 1px solid #1e3c72;
+            border: 1px solid var(--border);
             break-inside: avoid;
         }
         
         .pin-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-            border-color: #ff7b00;
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
         
         .pin-image {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #1e3c72 0%, #6a11cb 100%);
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 48px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pin-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            font-size: 40px;
         }
         
         .pin-content {
@@ -312,14 +476,14 @@
         
         .pin-title {
             font-weight: bold;
-            color: #ff7b00;
+            color: var(--primary-color);
             margin-bottom: 8px;
             font-size: 16px;
             line-height: 1.3;
         }
         
         .pin-description {
-            color: #8fa3c2;
+            color: var(--text-secondary);
             font-size: 14px;
             line-height: 1.4;
             margin-bottom: 12px;
@@ -346,17 +510,17 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: #2a5298;
+            background: var(--secondary-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ff7b00;
+            color: white;
             font-size: 12px;
         }
         
         .user-name {
             font-size: 12px;
-            color: #8fa3c2;
+            color: var(--text-secondary);
         }
         
         .pin-stats {
@@ -368,34 +532,129 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            color: #8fa3c2;
+            color: var(--text-secondary);
             font-size: 12px;
         }
         
-        /* Categories */
-        .categories {
+        /* Footer COM BORDA SUPERIOR */
+        footer {
+            background-color: var(--darker-bg);
+            padding: 40px 20px;
+            margin-top: 60px;
+            transition: all 0.3s ease;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .footer-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(116, 89, 179, 0.1);
+            display: flex;
+            align-items: center;
             justify-content: center;
-        }
-        
-        .category-btn {
-            padding: 10px 20px;
-            background: #152642;
-            border: 1px solid #1e3c72;
-            border-radius: 20px;
-            color: #8fa3c2;
-            cursor: pointer;
+            color: var(--text-secondary);
+            text-decoration: none;
             transition: all 0.3s;
-            font-size: 14px;
+            font-size: 1.1rem;
         }
         
-        .category-btn:hover, .category-btn.active {
-            background: #ff7b00;
+        body.dark-theme .social-link {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .social-link:hover {
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        body.dark-theme .social-link:hover {
+            background: rgba(189, 91, 255, 0.2);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+            background: rgba(116, 89, 179, 0.1);
+        }
+        
+        body.dark-theme .footer-links a:hover {
+            background: rgba(189, 91, 255, 0.1);
+        }
+        
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+            padding-top: 20px;
+            width: 100%;
+        }
+        
+        /* Botão de tema - CORRIGIDO */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
             color: white;
-            border-color: #ff7b00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(116, 89, 179, 0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        body.dark-theme .theme-toggle {
+            box-shadow: 0 4px 15px rgba(189, 91, 255, 0.3);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(116, 89, 179, 0.5);
+        }
+        
+        body.dark-theme .theme-toggle:hover {
+            box-shadow: 0 6px 20px rgba(189, 91, 255, 0.5);
         }
         
         /* Overlay para fechar o dropdown */
@@ -414,129 +673,382 @@
             display: block;
         }
         
-        html, body {
-            width: 100%;
-            height: 100%;
-        }
-        
+        /* Barra de rolagem personalizada */
         ::-webkit-scrollbar {
             width: 8px;
         }
         
         ::-webkit-scrollbar-track {
-            background: #0e1a2b;
+            background: var(--dark-bg);
         }
         
         ::-webkit-scrollbar-thumb {
-            background: #ff7b00;
+            background: var(--primary-color);
             border-radius: 4px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #ff9a42;
+            background: var(--secondary-color);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+            
+            .profile-name, .profile-username, .profile-stats, .topic-item span {
+                display: none;
+            }
+            
+            .profile-section {
+                padding: 10px 5px;
+                align-items: center;
+            }
+            
+            .profile-pic {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                margin-bottom: 0;
+            }
+            
+            .topic-item {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .topic-item i {
+                margin-right: 0;
+            }
+            
+            .pinterest-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .footer-main {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .pinterest-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body>
+<body class="dark-theme">
     <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <div class="logo">BONFIRE GAMES</div>
-            </div>
-            <div class="header-right">
-                <a href="notificacoes.html" class="notification-link">
-                    <i class="fa-solid fa-bell notification-icon"></i>
-                </a>
-                <a href="perfilatt1.html" class="profile-link">
-                    <div class="profile-pic-small">
-                        <i class="fas fa-user"></i>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <div class="search-header">
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Pesquisar jogos, builds, usuários..." id="searchInput">
-                    <button class="search-button" id="searchButton">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    
-                    <!-- Dropdown estilo Pinterest -->
-                    <div class="search-dropdown" id="searchDropdown">
-                        <div class="dropdown-section">
-                            <div class="section-title">Sugestões</div>
-                            <div class="suggestions-grid">
-                                <a href="#" class="suggestion-item" data-search="Minecraft builds">
-                                    <div class="suggestion-icon">🎮</div>
-                                    <div class="suggestion-text">Minecraft builds</div>
-                                </a>
-                                <a href="#" class="suggestion-item" data-search="Stardew Valley farm">
-                                    <div class="suggestion-icon">🌾</div>
-                                    <div class="suggestion-text">Stardew Valley farm</div>
-                                </a>
-                                <a href="#" class="suggestion-item" data-search="Terraria arena">
-                                    <div class="suggestion-icon">⚔️</div>
-                                    <div class="suggestion-text">Terraria arena</div>
-                                </a>
-                                <a href="#" class="suggestion-item" data-search="Pixel art">
-                                    <div class="suggestion-icon">🎨</div>
-                                    <div class="suggestion-text">Pixel art</div>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="dropdown-section" id="historySection">
-                            <div class="section-title">Histórico de pesquisa</div>
-                            <div class="history-grid" id="historyGrid">
-                                <!-- Histórico será gerado aqui -->
-                            </div>
-                            <button class="clear-all" id="clearAllHistory">
-                                Limpar todo o histórico
-                            </button>
-                        </div>
-                    </div>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Perfil no TOPO -->
+            <div class="profile-section" id="profile-icon">
+                <div class="profile-pic">
+                    <i class="fas fa-user"></i>
                 </div>
-                
-                <div class="categories">
-                    <button class="category-btn active" data-category="all">Tudo</button>
-                    <button class="category-btn" data-category="games">Jogos</button>
-                    <button class="category-btn" data-category="builds">Builds</button>
-                    <button class="category-btn" data-category="art">Arte</button>
-                    <button class="category-btn" data-category="users">Usuários</button>
-                    <button class="category-btn" data-category="communities">Comunidades</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Overlay para fechar dropdown -->
-        <div class="dropdown-overlay" id="dropdownOverlay"></div>
-        
-        <div class="pinterest-grid" id="pinterestGrid">
-            <!-- Conteúdo do grid Pinterest -->
-            <div class="pin-card">
-                <div class="pin-image">🎮</div>
-                <div class="pin-content">
-                    <div class="pin-title">Castelo Medieval no Minecraft</div>
-                    <div class="pin-description">Build impressionante de um castelo com detalhes góticos</div>
-                    <div class="pin-meta">
-                        <div class="pin-user">
-                            <div class="user-avatar">B</div>
-                            <div class="user-name">BuildMaster</div>
+                <div class="profile-info">
+                    <div class="profile-name">Alex Silva</div>
+                    <div class="profile-username">@alexsilva</div>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-value">125</span>
+                            <span class="stat-label">seguidores</span>
                         </div>
-                        <div class="pin-stats">
-                            <div class="pin-stat"><i class="fas fa-heart"></i> 2.4k</div>
+                        <div class="stat">
+                            <span class="stat-value">42</span>
+                            <span class="stat-label">seguindo</span>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Mais cards... -->
+            <div class="topics-section">
+                <!-- Tópicos com links funcionais -->
+                <a href="inicio.html" class="topic-item">
+                    <i class="fas fa-home"></i>
+                    <span>Início</span>
+                </a>
+                <a href="fangames.html" class="topic-item">
+                    <i class="fas fa-fire"></i>
+                    <span>Fangames</span>
+                </a>
+                <a href="forumatt.html" class="topic-item">
+                    <i class="fas fa-users"></i>
+                    <span>Comunidade</span>
+                </a>
+                <a href="pesquisa.html" class="topic-item active">
+                    <i class="fas fa-search"></i>
+                    <span>Pesquisar</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-fire"></i>
+                </div>
+            </div>
+            
+            <div class="search-content">
+                <div class="search-header">
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" class="search-input" placeholder="Pesquisar jogos, builds, usuários..." id="searchInput">
+                            <button class="search-button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            
+                            <!-- Dropdown estilo Pinterest -->
+                            <div class="search-dropdown" id="searchDropdown">
+                                <div class="dropdown-section">
+                                    <div class="section-title">Sugestões</div>
+                                    <div class="suggestions-grid">
+                                        <a href="#" class="suggestion-item" data-search="Minecraft builds">
+                                            <div class="suggestion-icon">🎮</div>
+                                            <div class="suggestion-text">Minecraft builds</div>
+                                        </a>
+                                        <a href="#" class="suggestion-item" data-search="Stardew Valley farm">
+                                            <div class="suggestion-icon">🌾</div>
+                                            <div class="suggestion-text">Stardew Valley farm</div>
+                                        </a>
+                                        <a href="#" class="suggestion-item" data-search="Terraria arena">
+                                            <div class="suggestion-icon">⚔️</div>
+                                            <div class="suggestion-text">Terraria arena</div>
+                                        </a>
+                                        <a href="#" class="suggestion-item" data-search="Pixel art">
+                                            <div class="suggestion-icon">🎨</div>
+                                            <div class="suggestion-text">Pixel art</div>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="dropdown-section" id="historySection">
+                                    <div class="section-title">Histórico de pesquisa</div>
+                                    <div class="history-grid" id="historyGrid">
+                                        <!-- Histórico será gerado aqui -->
+                                    </div>
+                                    <button class="clear-all" id="clearAllHistory">
+                                        Limpar todo o histórico
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="categories">
+                            <button class="category-btn active" data-category="all">Tudo</button>
+                            <button class="category-btn" data-category="games">Jogos</button>
+                            <button class="category-btn" data-category="builds">Builds</button>
+                            <button class="category-btn" data-category="art">Arte</button>
+                            <button class="category-btn" data-category="users">Usuários</button>
+                            <button class="category-btn" data-category="communities">Comunidades</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overlay para fechar dropdown -->
+                <div class="dropdown-overlay" id="dropdownOverlay"></div>
+                
+                <div class="pinterest-grid" id="pinterestGrid">
+                    <!-- Conteúdo do grid Pinterest -->
+                    <div class="pin-card">
+                        <div class="pin-image">🎮</div>
+                        <div class="pin-content">
+                            <div class="pin-title">Castelo Medieval no Minecraft</div>
+                            <div class="pin-description">Build impressionante de um castelo com detalhes góticos</div>
+                            <div class="pin-meta">
+                                <div class="pin-user">
+                                    <div class="user-avatar">B</div>
+                                    <div class="user-name">BuildMaster</div>
+                                </div>
+                                <div class="pin-stats">
+                                    <div class="pin-stat"><i class="fas fa-heart"></i> 2.4k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pin-card">
+                        <div class="pin-image">🏰</div>
+                        <div class="pin-content">
+                            <div class="pin-title">Fazenda Automatizada Stardew Valley</div>
+                            <div class="pin-description">Sistema completo de irrigação e coleta automatizada</div>
+                            <div class="pin-meta">
+                                <div class="pin-user">
+                                    <div class="user-avatar">F</div>
+                                    <div class="user-name">FarmerPro</div>
+                                </div>
+                                <div class="pin-stats">
+                                    <div class="pin-stat"><i class="fas fa-heart"></i> 1.8k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pin-card">
+                        <div class="pin-image">🎨</div>
+                        <div class="pin-content">
+                            <div class="pin-title">Pixel Art - Personagem RPG</div>
+                            <div class="pin-description">Design detalhado de personagem para jogos indie</div>
+                            <div class="pin-meta">
+                                <div class="pin-user">
+                                    <div class="user-avatar">P</div>
+                                    <div class="user-name">PixelArtist</div>
+                                </div>
+                                <div class="pin-stats">
+                                    <div class="pin-stat"><i class="fas fa-heart"></i> 3.2k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pin-card">
+                        <div class="pin-image">⚔️</div>
+                        <div class="pin-content">
+                            <div class="pin-title">Arena Boss Terraria</div>
+                            <div class="pin-description">Arena otimizada para batalhas contra chefes no hardmode</div>
+                            <div class="pin-meta">
+                                <div class="pin-user">
+                                    <div class="user-avatar">T</div>
+                                    <div class="user-name">TerrariaMaster</div>
+                                </div>
+                                <div class="pin-stats">
+                                    <div class="pin-stat"><i class="fas fa-heart"></i> 1.5k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pin-card">
+                        <div class="pin-image">🏠</div>
+                        <div class="pin-content">
+                            <div class="pin-title">Casa Moderna no Sims 4</div>
+                            <div class="pin-description">Residência contemporânea com todos os packs de expansão</div>
+                            <div class="pin-meta">
+                                <div class="pin-user">
+                                    <div class="user-avatar">S</div>
+                                    <div class="user-name">SimsBuilder</div>
+                                </div>
+                                <div class="pin-stats">
+                                    <div class="pin-stat"><i class="fas fa-heart"></i> 2.1k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pin-card">
+                        <div class="pin-image">🎭</div>
+                        <div class="pin-content">
+                            <div class="pin-title">Cosplay de Personagem de Jogo</div>
+                            <div class="pin-description">Traje completo com acessórios e maquiagem característica</div>
+                            <div class="pin-meta">
+                                <div class="pin-user">
+                                    <div class="user-avatar">C</div>
+                                    <div class="user-name">CosplayerGamer</div>
+                                </div>
+                                <div class="pin-stats">
+                                    <div class="pin-stat"><i class="fas fa-heart"></i> 4.7k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <div class="footer-content">
+                    <div class="footer-main">
+                        <div class="social-links">
+                            <a href="#" class="social-link">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="footer-links">
+                            <a href="#">Relatar Problemas</a>
+                            <a href="#">Contato</a>
+                        </div>
+                    </div>
+                    
+                    <div class="copyright">
+                        &copy; 2025 Bonfire Games. Todos os direitos reservados.
+                    </div>
+                </div>
+            </footer>
+        </div>
+        
+        <!-- Botão de tema - CORRIGIDO: Tema escuro = Sol, Tema claro = Lua -->
+        <div class="theme-toggle">
+            <i class="fas fa-sun"></i>
         </div>
     </div>
 
     <script>
+        // Navegação entre páginas (simulação)
+        document.querySelectorAll('.pin-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Em uma implementação real, isso redirecionaria para a página do conteúdo
+                alert('Redirecionando para a página do conteúdo...');
+            });
+        });
+        
+        // Redirecionamento para perfil apenas quando clica no ícone
+        document.getElementById('profile-icon').addEventListener('click', function() {
+            window.location.href = 'perfilatt1.html';
+        });
+        
+        // Alternar tema - TOTALMENTE CORRIGIDO
+        const themeToggle = document.querySelector('.theme-toggle');
+        
+        themeToggle.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            const body = document.body;
+            
+            if(body.classList.contains('dark-theme')) {
+                // Mudar para tema CLARO (sol -> lua)
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                body.classList.remove('dark-theme');
+            } else {
+                // Mudar para tema ESCURO (lua -> sol)
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                body.classList.add('dark-theme');
+            }
+        });
+
+        // Destacar tópico ativo baseado na página atual
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop() || 'pesquisa.html';
+            const topicItems = document.querySelectorAll('.topic-item');
+            
+            topicItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+
+        // Funcionalidades de pesquisa
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
