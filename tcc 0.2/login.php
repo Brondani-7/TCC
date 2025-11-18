@@ -3,7 +3,7 @@ require_once 'config.php';
 
 // Redirecionar se já estiver logado
 if (isLoggedIn()) {
-    header('Location: fangames.php');
+    header('Location: index.php');
     exit;
 }
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['customer_email'] = $user['CustomerGmail'];
                 
                 $_SESSION['success_message'] = 'Login realizado com sucesso!';
-                header('Location: fangames.php');
+                header('Location: index.php');
                 exit;
             } else {
                 $error = 'Email ou senha incorretos.';
@@ -339,4 +339,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </body>
+
 </html>
