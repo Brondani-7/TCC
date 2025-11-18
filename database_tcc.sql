@@ -1,12 +1,11 @@
--- database_tcc.sql atualizado
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 14/08/2025 às 16:41
+-- Tempo de geração: 18/11/2025 às 13:57
 -- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.0.30
+-- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -25,7 +24,27 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `fóruns`
+-- Estrutura para tabela `fangames`
+--
+
+CREATE TABLE `fangames` (
+  `GameID` int(11) UNSIGNED NOT NULL,
+  `GameTitle` varchar(255) NOT NULL,
+  `GameDescription` text DEFAULT NULL,
+  `DeveloperID` int(11) UNSIGNED NOT NULL,
+  `Downloads` int(11) DEFAULT 0,
+  `Rating` decimal(3,2) DEFAULT 0.00,
+  `FileSize` varchar(50) DEFAULT NULL,
+  `Status` enum('Completo','Em Desenvolvimento','Demo') DEFAULT 'Em Desenvolvimento',
+  `Genre` varchar(100) DEFAULT NULL,
+  `Franchise` varchar(100) DEFAULT NULL,
+  `CreatedAt` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `foruns`
 --
 
 CREATE TABLE `foruns` (
@@ -33,6 +52,21 @@ CREATE TABLE `foruns` (
   `ForumName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `CustomerID` int(11) NOT NULL,
   `PostID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `NotificationID` int(11) UNSIGNED NOT NULL,
+  `CustomerID` int(11) UNSIGNED NOT NULL,
+  `NotificationType` enum('social','games','achievements','system') DEFAULT 'social',
+  `NotificationText` text NOT NULL,
+  `IsRead` tinyint(1) DEFAULT 0,
+  `CreatedAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -54,7 +88,7 @@ CREATE TABLE `posts` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `usuários`
+-- Estrutura para tabela `usuarios`
 --
 
 CREATE TABLE `usuarios` (
@@ -64,34 +98,43 @@ CREATE TABLE `usuarios` (
   `CustomerPassword` varchar(255) NOT NULL,
   `CustomerHandle` varchar(255) DEFAULT NULL,
   `CustomerBio` text DEFAULT NULL,
-  `ProfileIcon` varchar(10) DEFAULT '🔥',
+  `ProfileIcon` varchar(10) DEFAULT '?',
   `ProfilePhoto` text DEFAULT NULL,
+  `CoverPhoto` text DEFAULT NULL,
   `CreatedAt` datetime DEFAULT current_timestamp()
-  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Estrutura para tabela `notifications`
+-- Despejando dados para a tabela `usuarios`
 --
 
-CREATE TABLE `notifications` (
-  `NotificationID` int(11) UNSIGNED NOT NULL,
-  `CustomerID` int(11) UNSIGNED NOT NULL,
-  `NotificationType` enum('social','games','achievements','system') DEFAULT 'social',
-  `NotificationText` text NOT NULL,
-  `IsRead` tinyint(1) DEFAULT 0,
-  `CreatedAt` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `usuarios` (`CustomerID`, `CustomerGmail`, `CustomerName`, `CustomerPassword`, `CustomerHandle`, `CustomerBio`, `ProfileIcon`, `ProfilePhoto`, `CoverPhoto`, `CreatedAt`) VALUES
+(1, 'guilherme@gmail.com', 'masterplan', '$2y$10$sZ9KMLyh4JjucZ4zoBywiOyDqAD.llPJGPU5fW/frFecj0gGkLP62', 'leonjud2', 'eu sou o master plan', '🔥', 'uploads/profiles/profile_1_1763467767.jpg', 'uploads/cover_photos/cover_1_1762871705.gif', '2025-11-11 11:02:26'),
+(2, 'pobre@pobre.com', 'pobre', '$2y$10$oXz6UJ8P6nSQMgjPRPTPBuJqd3e4KJZHM.rd5tRvpc7AFOTspys/W', 'pobre', NULL, '🔥', NULL, NULL, '2025-11-11 11:05:55');
 
 --
 -- Índices para tabelas despejadas
 --
 
 --
+-- Índices de tabela `fangames`
+--
+ALTER TABLE `fangames`
+  ADD PRIMARY KEY (`GameID`),
+  ADD KEY `DeveloperID` (`DeveloperID`);
+
+--
 -- Índices de tabela `foruns`
 --
 ALTER TABLE `foruns`
   ADD PRIMARY KEY (`ForumID`);
+
+--
+-- Índices de tabela `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`NotificationID`),
+  ADD KEY `CustomerID` (`CustomerID`);
 
 --
 -- Índices de tabela `posts`
@@ -106,86 +149,65 @@ ALTER TABLE `posts`
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`CustomerID`),
   ADD UNIQUE KEY `CustomerGmail` (`CustomerGmail`),
-  ADD UNIQUE KEY `CustomerHandle` (`CustomerHandle`),
-ADD COLUMN ProfileBanner TEXT NULL AFTER ProfilePhoto,
-ADD COLUMN Location VARCHAR(100) NULL AFTER CustomerBio,
-ADD COLUMN Website VARCHAR(255) NULL AFTER Location,
-ADD COLUMN UpdatedAt DATETIME NULL AFTER CreatedAt;
-
+  ADD UNIQUE KEY `CustomerHandle` (`CustomerHandle`);
 
 --
--- Índices de tabela `notifications`
+-- AUTO_INCREMENT para tabelas despejadas
 --
-ALTER TABLE `notifications`
-  ADD PRIMARY KEY (`NotificationID`),
-  ADD KEY `CustomerID` (`CustomerID`);
 
--- AUTO_INCREMENT de tabela `usuarios`
 --
-ALTER TABLE `usuarios`
-MODIFY `CustomerID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
-ADD COLUMN `ProfileBanner` text DEFAULT NULL AFTER `ProfilePhoto`,
-ADD COLUMN `Location` varchar(100) DEFAULT NULL AFTER `CustomerBio`,
-ADD COLUMN `Website` varchar(255) DEFAULT NULL AFTER `Location`,
-ADD COLUMN `TwitterHandle` varchar(100) DEFAULT NULL AFTER `Website`;
+-- AUTO_INCREMENT de tabela `fangames`
+--
+ALTER TABLE `fangames`
+  MODIFY `GameID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
+--
+-- AUTO_INCREMENT de tabela `foruns`
+--
+ALTER TABLE `foruns`
+  MODIFY `ForumID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `notifications`
 --
 ALTER TABLE `notifications`
   MODIFY `NotificationID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de tabela `posts`
+--
+ALTER TABLE `posts`
+  MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `CustomerID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- Restrições para tabelas despejadas
 --
+
+--
+-- Restrições para tabelas `fangames`
+--
+ALTER TABLE `fangames`
+  ADD CONSTRAINT `fangames_ibfk_1` FOREIGN KEY (`DeveloperID`) REFERENCES `usuarios` (`CustomerID`);
+
+--
+-- Restrições para tabelas `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `usuarios` (`CustomerID`);
 
 --
 -- Restrições para tabelas `posts`
 --
 ALTER TABLE `posts`
   ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `usuarios` (`CustomerID`);
---
--- Restrições para tabelas `notifications`
---
-ALTER TABLE `notifications`
-  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `usuarios` (`CustomerID`);
 COMMIT;
 
--- Adicione esta tabela ao seu arquivo database_tcc.sql
-
--- Se a coluna Tags não existir, adicione-a
-ALTER TABLE fangames ADD COLUMN Tags TEXT NULL AFTER Status;
-
--- Ou se preferir recriar a tabela completa:
-DROP TABLE IF EXISTS fangames;
-
-CREATE TABLE `fangames` (
-  `GameID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `GameTitle` varchar(255) NOT NULL,
-  `GameDescription` text DEFAULT NULL,
-  `DeveloperID` int(11) UNSIGNED NOT NULL,
-  `Franchise` varchar(100) DEFAULT NULL,
-  `Genre` varchar(100) DEFAULT NULL,
-  `Status` enum('Em Desenvolvimento','Lançado','Pausado','Cancelado') DEFAULT 'Em Desenvolvimento',
-  `Tags` text DEFAULT NULL,
-  `GameFile` text DEFAULT NULL,
-  `GameCover` text DEFAULT NULL,
-  `DownloadLink` text DEFAULT NULL,
-  `SystemRequirements` text DEFAULT NULL,
-  `ReleaseDate` date DEFAULT NULL,
-  `Downloads` int(11) DEFAULT 0,
-  `Rating` decimal(3,2) DEFAULT 0.00,
-  `CreatedAt` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`GameID`),
-  KEY `DeveloperID` (`DeveloperID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Adicione esta tabela ao database_tcc.sql
-CREATE TABLE IF NOT EXISTS `game_screenshots` (
-    `ScreenshotID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `GameID` int(11) UNSIGNED NOT NULL,
-    `ImagePath` text NOT NULL,
-    `CreatedAt` datetime DEFAULT current_timestamp(),
-    PRIMARY KEY (`ScreenshotID`),
-    KEY `GameID` (`GameID`),
-    FOREIGN KEY (`GameID`) REFERENCES `fangames`(`GameID`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
