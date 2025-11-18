@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['customer_email'] = $email;
         
         $_SESSION['success_message'] = 'Cadastro realizado com sucesso! Bem-vindo ao Bonfire Games!';
-        header('Location: fangames.php');
+        header('Location: index.php');
         exit;
 
     } catch (Exception $e) {

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['customer_email'] = $user['CustomerGmail'];
                 
                 $_SESSION['success_message'] = 'Login realizado com sucesso!';
-                header('Location: fangames.php');
+                header('Location: index.php');
                 exit;
             } else {
                 $error = 'Email ou senha incorretos.';

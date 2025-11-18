@@ -1,114 +1,40 @@
 <?php
-// add_fangame.php
+// fangames.php
 require_once 'config.php';
 
-// Verificar se o usuário está logado
-if (!isLoggedIn()) {
-    header('Location: login.php');
-    exit;
+$user = isLoggedIn() ? getCurrentUser($pdo) : null;
+
+// Parâmetros de busca/filtro
+$search = $_GET['search'] ?? '';
+$franchise = $_GET['franchise'] ?? '';
+$genre = $_GET['genre'] ?? '';
+$status = $_GET['status'] ?? '';
+$page = max(1, intval($_GET['page'] ?? 1));
+$limit = 12;
+$offset = ($page - 1) * $limit;
+
+// Buscar fangames
+if (!empty($search) || !empty($franchise) || !empty($genre) || !empty($status)) {
+    $fangames = searchFangames($pdo, $search, $franchise, $genre, $status, $limit, $offset);
+    $totalFangames = count(searchFangames($pdo, $search, $franchise, $genre, $status, 1000, 0));
+} else {
+    $fangames = getAllFangames($pdo, $limit, $offset);
+    $totalFangames = count(getAllFangames($pdo, 1000, 0));
 }
 
-$user = getCurrentUser($pdo);
-$message = '';
+// Obter opções de filtro
+$franchises = getUniqueFranchises($pdo);
+$genres = getUniqueGenres($pdo);
 
-// Processar o formulário de adição de fangame
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $gameTitle = trim($_POST['game_title']);
-    $gameDescription = trim($_POST['game_description']);
-    $franchise = trim($_POST['franchise']);
-    $genre = trim($_POST['genre']);
-    $status = $_POST['status'];
-    $tags = trim($_POST['tags']);
-    $systemRequirements = trim($_POST['system_requirements']);
-    $releaseDate = $_POST['release_date'] ?: null;
-    
-    try {
-        // Validações básicas
-        if (empty($gameTitle)) {
-            throw new Exception("O título do jogo é obrigatório.");
-        }
-
-        // Processar upload da capa
-        $gameCover = null;
-        if (isset($_FILES['game_cover']) && $_FILES['game_cover']['error'] === UPLOAD_ERR_OK) {
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            $fileType = $_FILES['game_cover']['type'];
-            
-            if (in_array($fileType, $allowedTypes)) {
-                $uploadDir = 'uploads/games/covers/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                
-                $fileExtension = pathinfo($_FILES['game_cover']['name'], PATHINFO_EXTENSION);
-                $filename = 'cover_' . $user['CustomerID'] . '_' . time() . '.' . $fileExtension;
-                $targetFile = $uploadDir . $filename;
-                
-                if ($_FILES['game_cover']['size'] <= 5 * 1024 * 1024) { // 5MB
-                    if (move_uploaded_file($_FILES['game_cover']['tmp_name'], $targetFile)) {
-                        $gameCover = $targetFile;
-                    }
-                }
-            }
-        }
-
-        // Processar upload do arquivo do jogo
-        $gameFile = null;
-        if (isset($_FILES['game_file']) && $_FILES['game_file']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = 'uploads/games/files/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-            
-            $fileExtension = pathinfo($_FILES['game_file']['name'], PATHINFO_EXTENSION);
-            $filename = 'game_' . $user['CustomerID'] . '_' . time() . '.' . $fileExtension;
-            $targetFile = $uploadDir . $filename;
-            
-            if ($_FILES['game_file']['size'] <= 100 * 1024 * 1024) { // 100MB
-                if (move_uploaded_file($_FILES['game_file']['tmp_name'], $targetFile)) {
-                    $gameFile = $targetFile;
-                }
-            }
-        }
-
-        // Inserir no banco de dados
-        $stmt = $pdo->prepare("
-            INSERT INTO fangames 
-            (GameTitle, GameDescription, DeveloperID, Franchise, Genre, Status, Tags, 
-             GameFile, GameCover, SystemRequirements, ReleaseDate, CreatedAt) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-        ");
-
-        $stmt->execute([
-            $gameTitle,
-            $gameDescription,
-            $user['CustomerID'],
-            $franchise,
-            $genre,
-            $status,
-            $tags,
-            $gameFile,
-            $gameCover,
-            $systemRequirements,
-            $releaseDate
-        ]);
-
-        $message = "Fangame publicado com sucesso!";
-        $_SESSION['success_message'] = $message;
-        header('Location: fangames.php');
-        exit;
-
-    } catch (Exception $e) {
-        $error = $e->getMessage();
-    }
-}
+$totalPages = ceil($totalFangames / $limit);
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Publicar Fangame | BONFIRE GAMES</title>
+    <title>Fangames | BONFIRE GAMES</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -145,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             min-height: 100vh;
         }
         
-        /* Sidebar - Manter igual ao fangames.php */
+        /* Sidebar */
         .sidebar {
             width: 250px;
             background-color: var(--secondary);
@@ -218,140 +144,375 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--light);
         }
         
-        /* Form Styles */
-        .form-container {
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Search and Filters */
+        .search-section {
             background: var(--secondary);
             border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .form-group {
+            padding: 25px;
             margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--light);
-            font-size: 1rem;
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
-        .form-input, .form-textarea, .form-select {
-            width: 100%;
-            padding: 12px 15px;
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
             background: var(--dark);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 25px;
             color: var(--light);
             font-size: 1rem;
             outline: none;
             transition: all 0.3s ease;
         }
         
-        .form-input:focus, .form-textarea:focus, .form-select:focus {
+        .search-input:focus {
             border-color: var(--gamejolt-green);
         }
         
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .file-input-container {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .file-input {
-            position: absolute;
-            left: -9999px;
-        }
-        
-        .file-input-label {
-            display: block;
-            padding: 12px 15px;
-            background: var(--dark);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            text-align: center;
+        .search-btn {
+            padding: 12px 25px;
+            background: var(--gamejolt-green);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .file-input-label:hover {
-            border-color: var(--gamejolt-green);
-            background: rgba(107, 198, 121, 0.1);
+        .search-btn:hover {
+            background: #5ab869;
+            transform: translateY(-2px);
         }
         
-        .form-actions {
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            background: var(--dark);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        /* Games Grid */
+        .games-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--light);
+        }
+        
+        .games-count {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .game-card {
+            background: var(--secondary);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-cover {
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--gamejolt-purple), var(--gamejolt-orange));
+        }
+        
+        .game-cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .game-card:hover .game-cover-image {
+            transform: scale(1.05);
+        }
+        
+        .game-cover .default-cover {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gamejolt-purple), var(--gamejolt-orange));
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .game-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+        
+        .status-released {
+            background: var(--gamejolt-green);
+            color: white;
+        }
+        
+        .status-development {
+            background: var(--gamejolt-orange);
+            color: white;
+        }
+        
+        .status-paused {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .status-cancelled {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .game-info {
+            padding: 20px;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--light);
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        
+        .game-developer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .dev-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+        }
+        
+        .dev-name {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .game-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .game-franchise, .game-genre {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .game-stats {
             display: flex;
             gap: 15px;
-            justify-content: flex-end;
-            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
         }
         
-        .btn {
-            padding: 12px 25px;
-            border: none;
+        .game-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .game-stat i {
+            color: var(--gamejolt-green);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        
+        .pagination-btn {
+            padding: 10px 15px;
+            background: var(--secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            font-weight: bold;
+            color: var(--light);
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
         
-        .btn-primary {
+        .pagination-btn:hover:not(.disabled) {
+            background: var(--primary);
+        }
+        
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-pages {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .page-number {
+            padding: 10px 15px;
+            background: var(--secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .page-number.active {
             background: var(--gamejolt-green);
             color: white;
         }
         
-        .btn-primary:hover {
-            background: #5ab869;
-            transform: translateY(-2px);
+        .page-number:hover:not(.active) {
+            background: var(--primary);
         }
         
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        
-        .alert-error {
-            background: rgba(231, 76, 60, 0.2);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-        }
-        
-        .alert-success {
-            background: rgba(46, 204, 113, 0.2);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-        
-        .form-help {
-            font-size: 0.85rem;
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
             color: var(--gray);
-            margin-top: 5px;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
         }
         
         @media (max-width: 992px) {
@@ -367,16 +528,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .main-content {
                 margin-left: 80px;
             }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
-            .form-actions {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
                 flex-direction: column;
             }
             
-            .btn {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
                 width: 100%;
-                justify-content: center;
+                justify-content: flex-end;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -395,7 +574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="fas fa-home"></i>
                     <span>Início</span>
                 </a>
-                <a href="fangames.php" class="nav-link">
+                <a href="fangames.php" class="nav-link active">
                     <i class="fas fa-gamepad"></i>
                     <span>Fangames</span>
                 </a>
@@ -403,166 +582,243 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="fas fa-users"></i>
                     <span>Fórum</span>
                 </a>
-                <a href="profile.php" class="nav-link">
+                <?php if ($user): ?>
+                <a href="perfil.php" class="nav-link">
                     <i class="fas fa-user"></i>
                     <span>Perfil</span>
                 </a>
+                <?php else: ?>
+                <a href="login.php" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </a>
+                <?php endif; ?>
             </div>
         </div>
         
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <div class="page-title">Publicar Fangame</div>
-                <a href="fangames.php" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    Voltar
-                </a>
+                <div class="page-title">Descobrir Fangames</div>
+                <div class="header-actions">
+                    <?php if ($user): ?>
+                    <a href="add_fangame.php" class="search-btn" style="text-decoration: none;">
+                        <i class="fas fa-plus"></i> Publicar Fangame
+                    </a>
+                    <div class="user-avatar" style="background-image: url('<?php echo getDevAvatar($user); ?>')" 
+                         onclick="window.location.href='profile.php'">
+                        <?php if(empty($user['ProfilePhoto'])): ?>
+                            <i class="fas fa-user"></i>
+                        <?php endif; ?>
+                    </div>
+                    <?php else: ?>
+                    <a href="login.php" class="search-btn" style="text-decoration: none;">
+                        <i class="fas fa-sign-in-alt"></i> Fazer Login
+                    </a>
+                    <?php endif; ?>
+                </div>
             </div>
             
-            <?php if (isset($error)): ?>
-                <div class="alert alert-error">
-                    <?= $error ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (isset($_SESSION['success_message'])): ?>
-                <div class="alert alert-success">
-                    <?= $_SESSION['success_message'] ?>
-                    <?php unset($_SESSION['success_message']); ?>
-                </div>
-            <?php endif; ?>
-            
-            <div class="form-container">
-                <form method="POST" action="add_fangame.php" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="game_title" class="form-label">Título do Fangame *</label>
-                        <input type="text" id="game_title" name="game_title" class="form-input" 
-                               placeholder="Digite o título do seu fangame" required
-                               value="<?= isset($_POST['game_title']) ? htmlspecialchars($_POST['game_title']) : '' ?>">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="game_description" class="form-label">Descrição *</label>
-                        <textarea id="game_description" name="game_description" class="form-textarea" 
-                                  placeholder="Descreva seu fangame, história, características..." required><?= isset($_POST['game_description']) ? htmlspecialchars($_POST['game_description']) : '' ?></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="franchise" class="form-label">Franquia Base *</label>
-                        <input type="text" id="franchise" name="franchise" class="form-input" 
-                               placeholder="Ex: Pokémon, Mario, Zelda, etc." required
-                               value="<?= isset($_POST['franchise']) ? htmlspecialchars($_POST['franchise']) : '' ?>">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="genre" class="form-label">Gênero *</label>
-                        <select id="genre" name="genre" class="form-select" required>
-                            <option value="">Selecione um gênero</option>
-                            <option value="RPG" <?= (isset($_POST['genre']) && $_POST['genre'] == 'RPG') ? 'selected' : '' ?>>RPG</option>
-                            <option value="Ação" <?= (isset($_POST['genre']) && $_POST['genre'] == 'Ação') ? 'selected' : '' ?>>Ação</option>
-                            <option value="Aventura" <?= (isset($_POST['genre']) && $_POST['genre'] == 'Aventura') ? 'selected' : '' ?>>Aventura</option>
-                            <option value="Estratégia" <?= (isset($_POST['genre']) && $_POST['genre'] == 'Estratégia') ? 'selected' : '' ?>>Estratégia</option>
-                            <option value="Esporte" <?= (isset($_POST['genre']) && $_POST['genre'] == 'Esporte') ? 'selected' : '' ?>>Esporte</option>
-                            <option value="Outro" <?= (isset($_POST['genre']) && $_POST['genre'] == 'Outro') ? 'selected' : '' ?>>Outro</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="status" class="form-label">Status do Desenvolvimento *</label>
-                        <select id="status" name="status" class="form-select" required>
-                            <option value="">Selecione o status</option>
-                            <option value="Em Desenvolvimento" <?= (isset($_POST['status']) && $_POST['status'] == 'Em Desenvolvimento') ? 'selected' : '' ?>>Em Desenvolvimento</option>
-                            <option value="Lançado" <?= (isset($_POST['status']) && $_POST['status'] == 'Lançado') ? 'selected' : '' ?>>Lançado</option>
-                            <option value="Pausado" <?= (isset($_POST['status']) && $_POST['status'] == 'Pausado') ? 'selected' : '' ?>>Pausado</option>
-                            <option value="Cancelado" <?= (isset($_POST['status']) && $_POST['status'] == 'Cancelado') ? 'selected' : '' ?>>Cancelado</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="tags" class="form-label">Tags</label>
-                        <input type="text" id="tags" name="tags" class="form-input" 
-                               placeholder="Ex: fangame, rpg, 2d, pixelart (separados por vírgula)"
-                               value="<?= isset($_POST['tags']) ? htmlspecialchars($_POST['tags']) : '' ?>">
-                        <div class="form-help">Palavras-chave para ajudar na busca do seu jogo</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="game_cover" class="form-label">Capa do Jogo</label>
-                        <div class="file-input-container">
-                            <input type="file" id="game_cover" name="game_cover" class="file-input" accept="image/*">
-                            <label for="game_cover" class="file-input-label">
-                                <i class="fas fa-image"></i>
-                                <span id="cover-label">Selecionar imagem de capa (max. 5MB)</span>
-                            </label>
-                        </div>
-                        <div class="form-help">Formatos: JPG, PNG, GIF, WebP</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="game_file" class="form-label">Arquivo do Jogo (ZIP/RAR)</label>
-                        <div class="file-input-container">
-                            <input type="file" id="game_file" name="game_file" class="file-input" accept=".zip,.rar,.7z">
-                            <label for="game_file" class="file-input-label">
-                                <i class="fas fa-file-archive"></i>
-                                <span id="file-label">Selecionar arquivo do jogo (max. 100MB)</span>
-                            </label>
-                        </div>
-                        <div class="form-help">Compacte seu jogo em ZIP, RAR ou 7Z</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="system_requirements" class="form-label">Requisitos do Sistema</label>
-                        <textarea id="system_requirements" name="system_requirements" class="form-textarea" 
-                                  placeholder="Especifique os requisitos mínimos para rodar o jogo..."><?= isset($_POST['system_requirements']) ? htmlspecialchars($_POST['system_requirements']) : '' ?></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="release_date" class="form-label">Data de Lançamento (Opcional)</label>
-                        <input type="date" id="release_date" name="release_date" class="form-input"
-                               value="<?= isset($_POST['release_date']) ? htmlspecialchars($_POST['release_date']) : '' ?>">
-                    </div>
-                    
-                    <div class="form-actions">
-                        <a href="fangames.php" class="btn btn-secondary">
-                            <i class="fas fa-times"></i>
-                            Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            Publicar Fangame
+            <!-- Search Section -->
+            <div class="search-section">
+                <form method="GET" action="fangames.php">
+                    <div class="search-bar">
+                        <input type="text" name="search" class="search-input" 
+                               placeholder="Buscar fangames..." value="<?php echo htmlspecialchars($search); ?>">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i> Buscar
                         </button>
                     </div>
+                    
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label class="filter-label">Franquia</label>
+                            <select name="franchise" class="filter-select">
+                                <option value="">Todas as franquias</option>
+                                <?php foreach ($franchises as $franchiseOption): ?>
+                                    <option value="<?php echo htmlspecialchars($franchiseOption); ?>" 
+                                        <?php echo $franchise === $franchiseOption ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($franchiseOption); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Gênero</label>
+                            <select name="genre" class="filter-select">
+                                <option value="">Todos os gêneros</option>
+                                <?php foreach ($genres as $genreOption): ?>
+                                    <option value="<?php echo htmlspecialchars($genreOption); ?>" 
+                                        <?php echo $genre === $genreOption ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($genreOption); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Status</label>
+                            <select name="status" class="filter-select">
+                                <option value="">Todos os status</option>
+                                <option value="Lançado" <?php echo $status === 'Lançado' ? 'selected' : ''; ?>>Lançado</option>
+                                <option value="Em Desenvolvimento" <?php echo $status === 'Em Desenvolvimento' ? 'selected' : ''; ?>>Em Desenvolvimento</option>
+                                <option value="Pausado" <?php echo $status === 'Pausado' ? 'selected' : ''; ?>>Pausado</option>
+                                <option value="Cancelado" <?php echo $status === 'Cancelado' ? 'selected' : ''; ?>>Cancelado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">&nbsp;</label>
+                            <a href="fangames.php" class="search-btn" style="text-decoration: none; text-align: center;">
+                                <i class="fas fa-times"></i> Limpar Filtros
+                            </a>
+                        </div>
+                    </div>
                 </form>
+            </div>
+            
+            <!-- Games Section -->
+            <div class="games-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        Fangames <?php echo !empty($search) ? "para '{$search}'" : 'Recentes'; ?>
+                    </div>
+                    <div class="games-count">
+                        <?php echo $totalFangames; ?> fangame<?php echo $totalFangames != 1 ? 's' : ''; ?> encontrado<?php echo $totalFangames != 1 ? 's' : ''; ?>
+                    </div>
+                </div>
+                
+                <?php if (!empty($fangames)): ?>
+                    <div class="games-grid">
+                        <?php foreach ($fangames as $game): 
+                            $gameCover = getGameCover($game);
+                            $devAvatar = getDevAvatar($game);
+                            $statusClass = 'status-' . strtolower(str_replace(' ', '-', $game['Status']));
+                        ?>
+                        <div class="game-card" onclick="window.location.href='game.php?id=<?php echo $game['GameID']; ?>'">
+                            <div class="game-cover">
+                                <?php if (!empty($gameCover)): ?>
+                                    <img src="<?php echo $gameCover; ?>" 
+                                         alt="<?php echo htmlspecialchars($game['GameTitle']); ?>" 
+                                         class="game-cover-image"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="default-cover" style="display: none;">
+                                        <i class="fas fa-gamepad"></i>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="default-cover">
+                                        <i class="fas fa-gamepad"></i>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <div class="game-status <?php echo $statusClass; ?>">
+                                    <?php echo $game['Status']; ?>
+                                </div>
+                            </div>
+                            
+                            <div class="game-info">
+                                <div class="game-header">
+                                    <div>
+                                        <h3 class="game-title"><?php echo htmlspecialchars($game['GameTitle']); ?></h3>
+                                        <div class="game-developer">
+                                            <div class="dev-avatar" style="background-image: url('<?php echo $devAvatar; ?>')">
+                                                <?php if(empty($devAvatar)): ?>
+                                                    <i class="fas fa-user"></i>
+                                                <?php endif; ?>
+                                            </div>
+                                            <span class="dev-name">@<?php echo htmlspecialchars($game['CustomerHandle'] ?? $game['CustomerName']); ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p class="game-description">
+                                    <?php 
+                                    $description = $game['GameDescription'];
+                                    if (strlen($description) > 150) {
+                                        $description = substr($description, 0, 150) . '...';
+                                    }
+                                    echo htmlspecialchars($description); 
+                                    ?>
+                                </p>
+                                
+                                <div class="game-meta">
+                                    <span class="game-franchise"><?php echo htmlspecialchars($game['Franchise']); ?></span>
+                                    <span class="game-genre"><?php echo htmlspecialchars($game['Genre']); ?></span>
+                                </div>
+                                
+                                <div class="game-stats">
+                                    <div class="game-stat">
+                                        <i class="fas fa-download"></i>
+                                        <span><?php echo number_format($game['Downloads'] ?? 0); ?> downloads</span>
+                                    </div>
+                                    <div class="game-stat">
+                                        <i class="fas fa-star"></i>
+                                        <span><?php echo number_format($game['Rating'] ?? 0, 1); ?></span>
+                                    </div>
+                                    <div class="game-stat">
+                                        <i class="fas fa-calendar"></i>
+                                        <span><?php echo date('d/m/Y', strtotime($game['CreatedAt'])); ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <?php if ($totalPages > 1): ?>
+                    <div class="pagination">
+                        <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" 
+                           class="pagination-btn <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                        
+                        <div class="pagination-pages">
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $i])); ?>" 
+                                   class="page-number <?php echo $i == $page ? 'active' : ''; ?>">
+                                    <?php echo $i; ?>
+                                </a>
+                            <?php endfor; ?>
+                        </div>
+                        
+                        <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" 
+                           class="pagination-btn <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                            Próxima <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                    
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-gamepad"></i>
+                        <h3>Nenhum fangame encontrado</h3>
+                        <p><?php echo !empty($search) ? 'Tente ajustar seus filtros de busca.' : 'Seja o primeiro a publicar um fangame!'; ?></p>
+                        <?php if ($user): ?>
+                        <a href="add_fangame.php" class="search-btn" style="margin-top: 20px; text-decoration: none;">
+                            <i class="fas fa-plus"></i> Publicar Primeiro Fangame
+                        </a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
     <script>
-        // Atualizar labels dos arquivos
-        document.getElementById('game_cover').addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name || 'Selecionar imagem de capa (max. 5MB)';
-            document.getElementById('cover-label').textContent = fileName;
+        // Auto-submit form quando filtros mudam
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                this.form.submit();
+            });
         });
         
-        document.getElementById('game_file').addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name || 'Selecionar arquivo do jogo (max. 100MB)';
-            document.getElementById('file-label').textContent = fileName;
-        });
-        
-        // Validação básica do formulário
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const title = document.getElementById('game_title').value.trim();
-            const description = document.getElementById('game_description').value.trim();
-            const franchise = document.getElementById('franchise').value.trim();
-            const genre = document.getElementById('genre').value;
-            const status = document.getElementById('status').value;
-            
-            if (!title || !description || !franchise || !genre || !status) {
-                e.preventDefault();
-                alert('Por favor, preencha todos os campos obrigatórios.');
-                return false;
-            }
+        // Adicionar loading state nos cliques
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.opacity = '0.7';
+            });
         });
     </script>
 </body>
