@@ -26,6 +26,57 @@ $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM forum_topics WHERE Category
 $stmt->execute([$categoryId]);
 $totalTopics = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 $totalPages = ceil($totalTopics / $limit);
+
+
+require_once 'config.php';
+
+$categoryId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+// DEBUG
+error_log("=== CATEGORY DEBUG ===");
+error_log("Category ID recebido: " . $categoryId);
+
+// Obter informações da categoria
+$stmt = $pdo->prepare("SELECT * FROM forum_categories WHERE CategoryID = ?");
+$stmt->execute([$categoryId]);
+$category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+error_log("Categoria encontrada: " . print_r($category, true));
+
+if (!$category) {
+    error_log("Categoria não encontrada, redirecionando...");
+    header('Location: forum.php');
+    exit;
+}
+
+// Buscar tópicos - VERSÃO CORRIGIDA
+try {
+    $sql = "
+        SELECT 
+            ft.*,
+            u.CustomerName,
+            u.CustomerHandle,
+            u.ProfilePhoto,
+            (SELECT COUNT(*) FROM forum_posts WHERE TopicID = ft.TopicID) as ReplyCount,
+            (SELECT CustomerName FROM usuarios WHERE CustomerID = ft.LastPostBy) as LastPosterName
+        FROM forum_topics ft
+        LEFT JOIN usuarios u ON ft.CustomerID = u.CustomerID
+        WHERE ft.CategoryID = ?
+        ORDER BY ft.IsSticky DESC, ft.CreatedAt DESC
+    ";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$categoryId]);
+    $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    error_log("Tópicos encontrados para categoria $categoryId: " . count($topics));
+    
+} catch (Exception $e) {
+    error_log("ERRO: " . $e->getMessage());
+    $topics = [];
+}
+
+// Resto do código...
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

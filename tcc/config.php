@@ -322,8 +322,8 @@ function checkForumTables($pdo) {
 }
 
 // Função para obter categorias do fórum
+// Função para obter categorias do fórum - VERSÃO CORRIGIDA
 function getForumCategories($pdo) {
-    // Verificar se as tabelas existem
     if (!checkForumTables($pdo)) {
         return [];
     }
@@ -336,38 +336,52 @@ function getForumCategories($pdo) {
                     JOIN forum_topics ft ON fp.TopicID = ft.TopicID 
                     WHERE ft.CategoryID = fc.CategoryID) as post_count
             FROM forum_categories fc 
+            WHERE fc.CategoryID >= 13  -- Apenas as categorias mais recentes
             ORDER BY fc.CategoryID
         ");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("Categorias encontradas: " . count($categories));
+        return $categories;
+        
     } catch (Exception $e) {
+        error_log("Erro em getForumCategories: " . $e->getMessage());
         return [];
     }
 }
 
+
 // Função para obter tópicos de uma categoria - CORRIGIDA
 function getCategoryTopics($pdo, $categoryId, $limit = 20, $offset = 0) {
     if (!checkForumTables($pdo)) {
+        error_log("Tabelas do fórum não existem");
         return [];
     }
     
     try {
         $stmt = $pdo->prepare("
-            SELECT ft.*, 
-                   u.CustomerName, 
-                   u.CustomerHandle,
-                   u.ProfilePhoto,
-                   lu.CustomerName as LastPosterName,
-                   lu.CustomerHandle as LastPosterHandle
+            SELECT 
+                ft.*, 
+                u.CustomerName, 
+                u.CustomerHandle,
+                u.ProfilePhoto,
+                (SELECT COUNT(*) FROM forum_posts fp WHERE fp.TopicID = ft.TopicID) as ReplyCount,
+                (SELECT CustomerName FROM usuarios WHERE CustomerID = ft.LastPostBy) as LastPosterName,
+                (SELECT CustomerHandle FROM usuarios WHERE CustomerID = ft.LastPostBy) as LastPosterHandle
             FROM forum_topics ft
             LEFT JOIN usuarios u ON ft.CustomerID = u.CustomerID
-            LEFT JOIN usuarios lu ON ft.LastPostBy = lu.CustomerID
             WHERE ft.CategoryID = ?
-            ORDER BY ft.IsSticky DESC, ft.UpdatedAt DESC
-            LIMIT ?, ?
+            ORDER BY ft.IsSticky DESC, COALESCE(ft.LastPostAt, ft.CreatedAt) DESC
+            LIMIT ? OFFSET ?
         ");
-        $stmt->execute([$categoryId, $offset, $limit]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute([$categoryId, $limit, $offset]);
+        $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("Encontrados " . count($topics) . " tópicos para categoria $categoryId");
+        return $topics;
+        
     } catch (Exception $e) {
+        error_log("Erro em getCategoryTopics: " . $e->getMessage());
         return [];
     }
 }
@@ -380,21 +394,24 @@ function getRecentTopics($pdo, $limit = 10) {
     
     try {
         $stmt = $pdo->prepare("
-            SELECT ft.*, 
-                   fc.CategoryName,
-                   u.CustomerName,
-                   u.CustomerHandle,
-                   lu.CustomerName as LastPosterName
+            SELECT 
+                ft.*, 
+                fc.CategoryName,
+                u.CustomerName,
+                u.CustomerHandle,
+                (SELECT COUNT(*) FROM forum_posts fp WHERE fp.TopicID = ft.TopicID) as ReplyCount,
+                (SELECT CustomerName FROM usuarios WHERE CustomerID = ft.LastPostBy) as LastPosterName
             FROM forum_topics ft
             LEFT JOIN forum_categories fc ON ft.CategoryID = fc.CategoryID
             LEFT JOIN usuarios u ON ft.CustomerID = u.CustomerID
-            LEFT JOIN usuarios lu ON ft.LastPostBy = lu.CustomerID
-            ORDER BY ft.UpdatedAt DESC
+            ORDER BY COALESCE(ft.LastPostAt, ft.CreatedAt) DESC
             LIMIT ?
         ");
         $stmt->execute([$limit]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
     } catch (Exception $e) {
+        error_log("Erro em getRecentTopics: " . $e->getMessage());
         return [];
     }
 }
