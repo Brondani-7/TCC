@@ -482,7 +482,7 @@ $recentTopics = getRecentTopics($pdo, 10);
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <div class="page-title">Fórum da Comunidade</div>
+                <div class="page-title">Fóruns da Comunidade</div>
                 <div class="header-actions">
                     <?php if ($user): ?>
                     <button class="new-topic-btn" onclick="openCreateTopicModal()">
