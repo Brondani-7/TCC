@@ -98,6 +98,7 @@ try {
             --danger: #e74c3c;
             --gamejolt-green: #6bc679;
             --gamejolt-purple: #8b6bc6;
+            --gamejolt-blue: #191b21;
         }
         
         * {
@@ -108,7 +109,7 @@ try {
         }
         
         body {
-            background-color: var(--secondary);
+            background-color: var(--gamejolt-blue);
             color: var(--light);
             line-height: 1.6;
         }
@@ -121,7 +122,7 @@ try {
         /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: var(--dark);
+            background-color: var(--secondary);
             padding: 20px;
             position: fixed;
             height: 100vh;
@@ -231,7 +232,7 @@ try {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            background: var(--dark);
+            background: var(--secondary);
             border-radius: 10px;
             overflow: hidden;
         }
@@ -444,7 +445,7 @@ try {
             <table class="topics-table">
                 <thead>
                     <tr>
-                        <th class="topic-title-cell">Tópico</th>
+                        <th class="topic-title-cell">Tópicos</th>
                         <th class="topic-stats-cell">Respostas</th>
                         <th class="topic-stats-cell">Visualizações</th>
                         <th class="topic-lastpost-cell">Última Mensagem</th>

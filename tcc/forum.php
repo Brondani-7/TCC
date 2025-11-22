@@ -50,6 +50,7 @@ $recentTopics = getRecentTopics($pdo, 10);
             --danger: #e74c3c;
             --gamejolt-green: #6bc679;
             --gamejolt-purple: #8b6bc6;
+            --gamejolt-blue: #191b21;
         }
         
         * {
@@ -60,7 +61,7 @@ $recentTopics = getRecentTopics($pdo, 10);
         }
         
         body {
-            background-color: var(--secondary);
+            background-color: var(--gamejolt-blue);
             color: var(--light);
             line-height: 1.6;
         }
@@ -73,7 +74,7 @@ $recentTopics = getRecentTopics($pdo, 10);
         /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: var(--dark);
+            background-color: var(--secondary);
             padding: 20px;
             position: fixed;
             height: 100vh;
@@ -177,7 +178,7 @@ $recentTopics = getRecentTopics($pdo, 10);
         }
         
         .category-card {
-            background: var(--dark);
+            background: var(--secondary);
             border-radius: 10px;
             padding: 20px;
             transition: all 0.3s ease;
@@ -219,14 +220,6 @@ $recentTopics = getRecentTopics($pdo, 10);
             display: flex;
             align-items: center;
             gap: 5px;
-        }
-        
-        /* Recent Topics */
-        .recent-topics {
-            background: var(--dark);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
         }
         
         .section-title {
@@ -293,97 +286,6 @@ $recentTopics = getRecentTopics($pdo, 10);
             display: flex;
             align-items: center;
             gap: 5px;
-        }
-        
-        /* Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background-color: var(--dark);
-            border-radius: 10px;
-            width: 600px;
-            max-width: 90%;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-content h2 {
-            margin-bottom: 20px;
-            color: var(--gamejolt-green);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--light);
-        }
-        
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            color: var(--light);
-            outline: none;
-        }
-        
-        .form-group textarea {
-            min-height: 150px;
-            resize: vertical;
-        }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .cancel-btn, .create-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .cancel-btn {
-            background-color: transparent;
-            color: var(--gray);
-            border: 1px solid var(--gray);
-        }
-        
-        .cancel-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .create-btn {
-            background-color: var(--gamejolt-green);
-            color: white;
-        }
-        
-        .create-btn:hover {
-            background-color: #5ab869;
         }
         
         /* Alert */
@@ -484,12 +386,7 @@ $recentTopics = getRecentTopics($pdo, 10);
             <div class="header">
                 <div class="page-title">Fóruns da Comunidade</div>
                 <div class="header-actions">
-                    <?php if ($user): ?>
-                    <button class="new-topic-btn" onclick="openCreateTopicModal()">
-                        <i class="fas fa-plus"></i>
-                        Novo Tópico
-                    </button>
-                    <?php else: ?>
+                    <?php if (!$user): ?>
                     <a href="login.php" class="new-topic-btn">
                         <i class="fas fa-sign-in-alt"></i>
                         Fazer Login
@@ -530,116 +427,8 @@ $recentTopics = getRecentTopics($pdo, 10);
                     </div>
                 </div>
                 <?php endforeach; ?>
-            </div>
-            
-            <!-- Recent Topics -->
-            <div class="recent-topics">
-                <h2 class="section-title">
-                    <i class="fas fa-clock"></i>
-                    Tópicos Recentes
-                </h2>
-                
-                <div class="topics-list">
-                    <?php foreach ($recentTopics as $topic): ?>
-                    <div class="topic-item <?= $topic['IsSticky'] ? 'topic-sticky' : '' ?>">
-                        <div class="topic-info">
-                            <a href="topic.php?id=<?= $topic['TopicID'] ?>" class="topic-title">
-                                <?php if ($topic['IsSticky']): ?>
-                                <span class="sticky-badge">Fixado</span>
-                                <?php endif; ?>
-                                <?= htmlspecialchars($topic['TopicTitle']) ?>
-                            </a>
-                            <div class="topic-meta">
-                                <span>por <?= htmlspecialchars($topic['CustomerName']) ?></span>
-                                <span>em <?= htmlspecialchars($topic['CategoryName']) ?></span>
-                                <span><?= date('d/m/Y H:i', strtotime($topic['CreatedAt'])) ?></span>
-                            </div>
-                        </div>
-                        <div class="topic-stats">
-                            <div class="topic-stat">
-                                <i class="fas fa-eye"></i>
-                                <span><?= $topic['ViewCount'] ?></span>
-                            </div>
-                            <div class="topic-stat">
-                                <i class="fas fa-comment"></i>
-                                <span><?= $topic['ReplyCount'] ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
+            </div>       
         </div>
     </div>
-
-    <!-- Modal de Criar Tópico -->
-    <?php if ($user): ?>
-    <div id="createTopicModal" class="modal">
-        <div class="modal-content">
-            <h2>Criar Novo Tópico</h2>
-            <form method="POST">
-                <input type="hidden" name="create_topic" value="1">
-                
-                <div class="form-group">
-                    <label for="category_id">Categoria</label>
-                    <select id="category_id" name="category_id" required>
-                        <option value="">Selecione uma categoria</option>
-                        <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category['CategoryID'] ?>"><?= htmlspecialchars($category['CategoryName']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="topic_title">Título do Tópico</label>
-                    <input type="text" id="topic_title" name="topic_title" placeholder="Digite o título do tópico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="topic_description">Descrição (opcional)</label>
-                    <input type="text" id="topic_description" name="topic_description" placeholder="Breve descrição do tópico">
-                </div>
-                
-                <div class="form-group">
-                    <label for="post_content">Conteúdo</label>
-                    <textarea id="post_content" name="post_content" placeholder="Digite o conteúdo do seu post" required></textarea>
-                </div>
-                
-                <div class="modal-actions">
-                    <button type="button" class="cancel-btn" onclick="closeCreateTopicModal()">Cancelar</button>
-                    <button type="submit" class="create-btn">
-                        <i class="fas fa-plus"></i>
-                        Criar Tópico
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <script>
-        function openCreateTopicModal() {
-            document.getElementById('createTopicModal').style.display = 'flex';
-        }
-
-        function closeCreateTopicModal() {
-            document.getElementById('createTopicModal').style.display = 'none';
-        }
-
-        // Fechar modal ao clicar fora
-        window.onclick = function(event) {
-            const modal = document.getElementById('createTopicModal');
-            if (event.target === modal) {
-                closeCreateTopicModal();
-            }
-        }
-
-        // Fechar modal com ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeCreateTopicModal();
-            }
-        });
-    </script>
 </body>
 </html>

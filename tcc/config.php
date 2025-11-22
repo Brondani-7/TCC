@@ -68,18 +68,48 @@ function hasUserLikedPost($pdo, $postId, $userId) {
     return $stmt->fetch() !== false;
 }
 
-// Função para editar post
+// Função para editar post - CORRIGIDA
 function editForumPost($pdo, $postId, $newContent, $userId) {
+    if (!checkForumTables($pdo)) {
+        return ['success' => false, 'error' => 'Tabelas do fórum não existem'];
+    }
+    
     try {
+        // Verificar se o usuário é o autor do post
+        $stmt = $pdo->prepare("SELECT CustomerID FROM forum_posts WHERE PostID = ?");
+        $stmt->execute([$postId]);
+        $post = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$post) {
+            return ['success' => false, 'error' => 'Post não encontrado'];
+        }
+        
+        if ($post['CustomerID'] != $userId) {
+            return ['success' => false, 'error' => 'Sem permissão para editar este post'];
+        }
+        
+        // Atualizar o post
         $stmt = $pdo->prepare("
             UPDATE forum_posts 
-            SET PostContent = ?, UpdatedAt = NOW(), IsEdited = 1, EditedBy = ?, EditedAt = NOW() 
-            WHERE PostID = ? AND CustomerID = ?
+            SET PostContent = ?, 
+                UpdatedAt = NOW(),
+                IsEdited = 1,
+                EditedBy = ?,
+                EditedAt = NOW()
+            WHERE PostID = ?
         ");
-        $result = $stmt->execute([$newContent, $userId, $postId, $userId]);
-        return $result;
+        
+        $result = $stmt->execute([$newContent, $userId, $postId]);
+        
+        if ($result) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => 'Erro ao atualizar no banco de dados'];
+        }
+        
     } catch (Exception $e) {
-        return false;
+        error_log("Erro em editForumPost: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Erro no servidor: ' . $e->getMessage()];
     }
 }
 

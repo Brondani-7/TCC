@@ -18,7 +18,7 @@ incrementTopicViews($pdo, $topicId);
 // Obter posts do tópico
 $posts = getTopicPosts($pdo, $topicId);
 
-// Processar ações via AJAX
+// Processar ações via AJAX - CORRIGIDO
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header('Content-Type: application/json');
     
@@ -36,7 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             case 'edit':
                 if (isset($_POST['post_id']) && isset($_POST['content'])) {
                     $result = editForumPost($pdo, $_POST['post_id'], $_POST['content'], $_SESSION['customer_id']);
-                    $response = ['success' => $result];
+                    $response = $result;
+                } else {
+                    $response = ['success' => false, 'error' => 'Dados incompletos para edição'];
                 }
                 break;
                 
@@ -49,6 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }
                 break;
+                
+            default:
+                $response = ['success' => false, 'error' => 'Ação desconhecida'];
         }
         
         echo json_encode($response);
@@ -106,6 +111,37 @@ if ($user && !empty($posts)) {
             --gamejolt-purple: #8b6bc6;
         }
         
+        /* Adicione ao CSS existente */
+        .edited-indicator {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .edit-form {
+            transition: all 0.3s ease;
+        }
+
+        .save-btn.success {
+            background: var(--success) !important;
+        }
+
+        /* Loading state para botões */
+        .btn-loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .btn-loading::after {
+            content: '...';
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -1020,7 +1056,7 @@ if ($user && !empty($posts)) {
             }
         }
 
-        // Função para iniciar edição
+        // Função para iniciar edição - MELHORADA
         function startEdit(postId) {
             const postText = document.getElementById(`post-text-${postId}`);
             const editForm = document.getElementById(`edit-form-${postId}`);
@@ -1030,21 +1066,35 @@ if ($user && !empty($posts)) {
             postText.style.display = 'none';
             editForm.style.display = 'block';
             
-            // Focar no textarea
+            // Preencher textarea com o conteúdo atual (sem tags HTML)
+            const currentContent = postText.textContent || postText.innerText;
+            editTextarea.value = currentContent;
+            
+            // Focar e selecionar todo o texto
             editTextarea.focus();
-            editTextarea.setSelectionRange(editTextarea.value.length, editTextarea.value.length);
+            editTextarea.setSelectionRange(0, editTextarea.value.length);
+            
+            // Auto-expand textarea
+            editTextarea.style.height = 'auto';
+            editTextarea.style.height = (editTextarea.scrollHeight) + 'px';
         }
 
-        // Função para cancelar edição
+        // Função para cancelar edição - CORRIGIDA
         function cancelEdit(postId) {
             const postText = document.getElementById(`post-text-${postId}`);
             const editForm = document.getElementById(`edit-form-${postId}`);
             
             postText.style.display = 'block';
             editForm.style.display = 'none';
+            
+            // Restaurar conteúdo original se necessário
+            const originalContent = postText.innerHTML;
+            const editTextarea = document.getElementById(`edit-textarea-${postId}`);
+            editTextarea.value = originalContent.replace(/<br\s*\/?>/gi, '\n');
         }
 
-        // Função para salvar edição
+        
+        // Função para salvar edição - CORRIGIDA
         async function saveEdit(postId) {
             const editTextarea = document.getElementById(`edit-textarea-${postId}`);
             const postText = document.getElementById(`post-text-${postId}`);
@@ -1068,37 +1118,42 @@ if ($user && !empty($posts)) {
                 
                 if (result.success) {
                     // Atualizar conteúdo
-                    postText.textContent = newContent;
+                    postText.innerHTML = newContent.replace(/\n/g, '<br>');
                     
                     // Esconder formulário, mostrar texto
                     postText.style.display = 'block';
                     document.getElementById(`edit-form-${postId}`).style.display = 'none';
                     
-                    // Adicionar indicador de edição se não existir
+                    // Adicionar/atualizar indicador de edição
                     const postMeta = postText.closest('.post-content').querySelector('.post-meta');
-                    if (!postMeta.querySelector('.edited-indicator')) {
-                        const editedSpan = document.createElement('span');
-                        editedSpan.innerHTML = '<i class="fas fa-edit"></i> Editado agora';
-                        editedSpan.className = 'edited-indicator';
-                        postMeta.appendChild(editedSpan);
+                    let editedIndicator = postMeta.querySelector('.edited-indicator');
+                    
+                    if (!editedIndicator) {
+                        editedIndicator = document.createElement('span');
+                        editedIndicator.className = 'edited-indicator';
+                        editedIndicator.innerHTML = ' <i class="fas fa-edit"></i> Editado agora';
+                        postMeta.appendChild(editedIndicator);
+                    } else {
+                        editedIndicator.innerHTML = ' <i class="fas fa-edit"></i> Editado agora';
                     }
                     
-                    // Feedback visual
+                    // Feedback visual de sucesso
                     const saveBtn = event.target;
-                    saveBtn.textContent = 'Salvo!';
-                    saveBtn.style.background = 'var(--gamejolt-green)';
+                    const originalText = saveBtn.textContent;
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+                    saveBtn.style.background = 'var(--success)';
                     
                     setTimeout(() => {
-                        saveBtn.textContent = 'Salvar';
+                        saveBtn.innerHTML = originalText;
                         saveBtn.style.background = '';
                     }, 2000);
                     
                 } else {
-                    alert('Erro ao editar o post.');
+                    alert('Erro ao editar o post: ' + (result.error || 'Erro desconhecido'));
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                alert('Erro ao editar o post.');
+                alert('Erro de conexão ao editar o post.');
             }
         }
 

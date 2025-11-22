@@ -127,33 +127,6 @@ INSERT INTO `forum_posts` (`PostID`, `TopicID`, `CustomerID`, `PostContent`, `Cr
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `forum_posts_old`
---
-
-CREATE TABLE `forum_posts_old` (
-  `PostID` int(11) UNSIGNED NOT NULL,
-  `CustomerID` int(11) UNSIGNED NOT NULL,
-  `Data` datetime DEFAULT current_timestamp(),
-  `PostMessage` text DEFAULT NULL,
-  `Likes` int(11) DEFAULT 0,
-  `Retweets` int(11) DEFAULT 0,
-  `Comments` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `forum_posts_old`
---
-
-INSERT INTO `forum_posts_old` (`PostID`, `CustomerID`, `Data`, `PostMessage`, `Likes`, `Retweets`, `Comments`) VALUES
-(1, 3, '2025-11-18 10:29:18', 'oasd\r\n', 0, 0, 0),
-(2, 3, '2025-11-18 10:29:22', 'oi', 0, 0, 0),
-(3, 3, '2025-11-18 10:29:33', 'a', 0, 0, 0),
-(4, 4, '2025-11-18 10:31:11', 'asd', 0, 0, 0),
-(5, 4, '2025-11-18 10:45:24', 'ola', 0, 0, 0);
-
--- --------------------------------------------------------
-
---
 -- Estrutura para tabela `forum_topics`
 --
 
@@ -260,13 +233,6 @@ ALTER TABLE `forum_posts`
   ADD KEY `EditedBy` (`EditedBy`);
 
 --
--- Índices de tabela `forum_posts_old`
---
-ALTER TABLE `forum_posts_old`
-  ADD PRIMARY KEY (`PostID`),
-  ADD KEY `CustomerID` (`CustomerID`);
-
---
 -- Índices de tabela `forum_topics`
 --
 ALTER TABLE `forum_topics`
@@ -318,12 +284,6 @@ ALTER TABLE `forum_posts`
   MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT de tabela `forum_posts_old`
---
-ALTER TABLE `forum_posts_old`
-  MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
 -- AUTO_INCREMENT de tabela `forum_topics`
 --
 ALTER TABLE `forum_topics`
@@ -365,12 +325,6 @@ ALTER TABLE `forum_posts`
   ADD CONSTRAINT `forum_posts_ibfk_1` FOREIGN KEY (`TopicID`) REFERENCES `forum_topics` (`TopicID`),
   ADD CONSTRAINT `forum_posts_ibfk_2` FOREIGN KEY (`CustomerID`) REFERENCES `usuarios` (`CustomerID`),
   ADD CONSTRAINT `forum_posts_ibfk_3` FOREIGN KEY (`EditedBy`) REFERENCES `usuarios` (`CustomerID`);
-
---
--- Restrições para tabelas `forum_posts_old`
---
-ALTER TABLE `forum_posts_old`
-  ADD CONSTRAINT `forum_posts_old_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `usuarios` (`CustomerID`);
 
 --
 -- Restrições para tabelas `forum_topics`

@@ -3,7 +3,7 @@ require_once 'config.php';
 
 // Redirecionar se já estiver logado
 if (isLoggedIn()) {
-    header('Location: fangames.php');
+    header('Location: index.php');
     exit;
 }
 

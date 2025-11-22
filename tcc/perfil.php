@@ -14,7 +14,7 @@ $message = '';
 // Buscar estatísticas do usuário
 $stmt = $pdo->prepare("
     SELECT 
-        (SELECT COUNT(*) FROM forum_posts_old  WHERE CustomerID = ?) as post_count,
+        (SELECT COUNT(*) FROM forum_posts  WHERE CustomerID = ?) as post_count,
         (SELECT COUNT(*) FROM fangames WHERE DeveloperID = ?) as game_count
 ");
 $stmt->execute([$user['CustomerID'], $user['CustomerID']]);
@@ -423,10 +423,10 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .edit-profile-btn {
-            background: var(--gamejolt-green);
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
@@ -434,10 +434,11 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
         
         .edit-profile-btn:hover {
-            background: #5ab869;
+            background: var(--gamejolt-green);
             transform: translateY(-2px);
         }
         
@@ -490,7 +491,7 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .publish-game-btn:hover {
-            background: var(--primary-dark);
+            background: var(--gamejolt-green);
             transform: translateY(-2px);
         }
         
