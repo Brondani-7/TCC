@@ -179,6 +179,99 @@ function getPostWithLikes($pdo, $postId, $currentUserId = null) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+// Adicione estas funções ao config.php, após as funções de posts
+
+// Função para editar tópico
+function editForumTopic($pdo, $topicId, $title, $description, $userId) {
+    if (!checkForumTables($pdo)) {
+        return ['success' => false, 'error' => 'Tabelas do fórum não existem'];
+    }
+    
+    try {
+        // Verificar se o usuário é o autor do tópico
+        $stmt = $pdo->prepare("SELECT CustomerID FROM forum_topics WHERE TopicID = ?");
+        $stmt->execute([$topicId]);
+        $topic = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$topic) {
+            return ['success' => false, 'error' => 'Tópico não encontrado'];
+        }
+        
+        if ($topic['CustomerID'] != $userId) {
+            return ['success' => false, 'error' => 'Sem permissão para editar este tópico'];
+        }
+        
+        // Atualizar o tópico
+        $stmt = $pdo->prepare("
+            UPDATE forum_topics 
+            SET TopicTitle = ?, 
+                TopicDescription = ?,
+                UpdatedAt = NOW()
+            WHERE TopicID = ?
+        ");
+        
+        $result = $stmt->execute([$title, $description, $topicId]);
+        
+        if ($result) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => 'Erro ao atualizar no banco de dados'];
+        }
+        
+    } catch (Exception $e) {
+        error_log("Erro em editForumTopic: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Erro no servidor: ' . $e->getMessage()];
+    }
+}
+
+// Função para deletar tópico
+function deleteForumTopic($pdo, $topicId, $userId) {
+    if (!checkForumTables($pdo)) {
+        return false;
+    }
+    
+    $pdo->beginTransaction();
+    
+    try {
+        // Verificar se é o autor ou admin
+        $stmt = $pdo->prepare("SELECT CustomerID, CategoryID FROM forum_topics WHERE TopicID = ?");
+        $stmt->execute([$topicId]);
+        $topic = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$topic) {
+            throw new Exception("Tópico não encontrado");
+        }
+        
+        // Permitir se for o autor ou admin (CustomerID = 1)
+        if ($topic['CustomerID'] != $userId && $userId != 1) {
+            throw new Exception("Sem permissão para deletar este tópico");
+        }
+        
+        // Deletar likes dos posts primeiro
+        $stmt = $pdo->prepare("
+            DELETE FROM forum_likes 
+            WHERE PostID IN (SELECT PostID FROM forum_posts WHERE TopicID = ?)
+        ");
+        $stmt->execute([$topicId]);
+        
+        // Deletar posts
+        $stmt = $pdo->prepare("DELETE FROM forum_posts WHERE TopicID = ?");
+        $stmt->execute([$topicId]);
+        
+        // Deletar tópico
+        $stmt = $pdo->prepare("DELETE FROM forum_topics WHERE TopicID = ?");
+        $stmt->execute([$topicId]);
+        
+        $pdo->commit();
+        return true;
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Erro em deleteForumTopic: " . $e->getMessage());
+        return false;
+    }
+}
+
 // Função para obter dados do usuário logado
 function getCurrentUser($pdo) {
     if (!isLoggedIn()) return null;
