@@ -272,11 +272,10 @@ function deleteForumTopic($pdo, $topicId, $userId) {
     }
 }
 
-// Função para obter dados do usuário logado
 function getCurrentUser($pdo) {
     if (!isLoggedIn()) return null;
     
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE CustomerID = ?");
+    $stmt = $pdo->prepare("SELECT *, ProfileBanner FROM usuarios WHERE CustomerID = ?");
     $stmt->execute([$_SESSION['customer_id']]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -420,9 +419,8 @@ function logout() {
     exit;
 }
 
-// Função para criar diretórios se não existirem
 function createUploadDirs() {
-    $dirs = ['uploads/games/covers', 'uploads/games/files', 'uploads/profiles', 'uploads/games/screenshots'];
+    $dirs = ['uploads/games/covers', 'uploads/games/files', 'uploads/profiles', 'uploads/games/screenshots', 'uploads/banners'];
     foreach ($dirs as $dir) {
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
