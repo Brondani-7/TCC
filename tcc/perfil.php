@@ -77,16 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_banner'])) {
             
             if ($_FILES['profile_banner']['size'] <= 10 * 1024 * 1024) {
                 if (move_uploaded_file($_FILES['profile_banner']['tmp_name'], $target_file)) {
-                    // Atualizar banner no banco (se a coluna existir)
-                    try {
-                        $stmt = $pdo->prepare("UPDATE usuarios SET ProfileBanner = ? WHERE CustomerID = ?");
-                        $stmt->execute([$target_file, $user['CustomerID']]);
+                    // Atualizar banner no banco
+                    $stmt = $pdo->prepare("UPDATE usuarios SET ProfileBanner = ? WHERE CustomerID = ?");
+                    if ($stmt->execute([$target_file, $user['CustomerID']])) {
+                        $message = "Banner atualizado com sucesso!";
                         $user['ProfileBanner'] = $target_file;
-                    } catch (Exception $e) {
-                        // Se a coluna não existir, usar session
-                        $_SESSION['profile_banner'] = $target_file;
+                    } else {
+                        $message = "Erro ao atualizar banner no banco de dados.";
                     }
-                    $message = "Banner atualizado com sucesso!";
                 } else {
                     $message = "Erro ao fazer upload do banner.";
                 }
@@ -96,6 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_banner'])) {
         } else {
             $message = "Tipo de arquivo não permitido para banner.";
         }
+    } else {
+        $message = "Erro no upload do arquivo de banner.";
     }
 }
 
@@ -890,7 +890,7 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             <!-- Profile Header -->
             <div class="profile-header">
-                <div class="profile-banner" style="background-image: url('<?php echo !empty($user['ProfileBanner']) ? $user['ProfileBanner'] : (isset($_SESSION['profile_banner']) ? $_SESSION['profile_banner'] : ''); ?>')">
+                <div class="profile-banner" style="background-image: url('<?php echo !empty($user['ProfileBanner']) ? $user['ProfileBanner'] : ''; ?>')">
                     <div class="banner-overlay">
                         <form method="POST" enctype="multipart/form-data">
                             <input type="file" name="profile_banner" accept="image/*" style="display: none;" id="bannerInput">
