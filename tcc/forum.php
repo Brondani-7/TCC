@@ -96,7 +96,7 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BONFIRE GAMES - Fórum</title>
+    <title>Fóruns | BONFIRE GAMES </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -115,7 +115,72 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             --mobile-breakpoint: 768px;
             --tablet-breakpoint: 1024px;
         }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
         
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--secondary);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .user-dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .user-avatar-container {
+            position: relative;
+            display: inline-block;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -667,17 +732,6 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
                     <i class="fas fa-users"></i>
                     <span>Fórum</span>
                 </a>
-                <?php if ($user): ?>
-                <a href="perfil.php" class="nav-link">
-                    <i class="fas fa-user"></i>
-                    <span>Perfil</span>
-                </a>
-                <?php else: ?>
-                <a href="login.php" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Login</span>
-                </a>
-                <?php endif; ?>
             </div>
         </div>
         
@@ -686,7 +740,25 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             <div class="header">
                 <div class="page-title">Fóruns da Comunidade</div>
                 <div class="header-actions">
-                    <?php if (!$user): ?>
+                    <?php if ($user): ?>
+                    <div class="user-avatar-container">
+                        <div class="user-avatar" id="userAvatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
+                            <?php if(empty($user['ProfilePhoto'])): ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="perfil.php" class="user-dropdown-item">
+                                <i class="fas fa-user"></i>
+                                Meu Perfil
+                            </a>
+                            <a href="logout.php" class="user-dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                    <?php else: ?>
                     <a href="login.php" class="new-topic-btn">
                         <i class="fas fa-sign-in-alt"></i>
                         Fazer Login
@@ -749,27 +821,25 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
 
         console.log('Browser Info:', browserInfo);
 
-        // Mostrar notificação do navegador
-        const browserNotification = document.getElementById('browserNotification');
-        const browserNotificationClose = document.getElementById('browserNotificationClose');
+        // User dropdown functionality
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
         
-        if (browserNotification && browserNotificationClose) {
-            // Mostrar notificação após 1 segundo
-            setTimeout(() => {
-                browserNotification.classList.add('show');
-            }, 1000);
-            
-            // Fechar notificação ao clicar no botão
-            browserNotificationClose.addEventListener('click', function() {
-                browserNotification.classList.remove('show');
+        if (userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
             });
             
-            // Fechar automaticamente após 8 segundos
-            setTimeout(() => {
-                if (browserNotification.classList.contains('show')) {
-                    browserNotification.classList.remove('show');
-                }
-            }, 8000);
+            // Fechar dropdown ao clicar fora
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+            
+            // Prevenir fechamento ao clicar no dropdown
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         }
 
         // Otimizações baseadas no navegador

@@ -150,6 +150,73 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --gamejolt-green: #6bc679;
             --gamejolt-purple: #8b6bc6;
         }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--secondary);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .user-dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .user-avatar-container {
+            position: relative;
+            display: inline-block;
+        }
         
         * {
             margin: 0;
@@ -263,20 +330,7 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .header-icon:hover {
             background-color: var(--primary);
         }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
-        }
-        
+    
         /* Profile Header */
         .profile-header {
             position: relative;
@@ -803,12 +857,27 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="header">
                 <div class="page-title">Perfil</div>
                 <div class="header-actions">
-                    <div class="header-icon">
-                        <i class="fas fa-search"></i>
+                    <?php if ($user): ?>
+                    <div class="user-avatar-container">
+                        <div class="user-avatar" id="userAvatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
+                            <?php if(empty($user['ProfilePhoto'])): ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            
+                            <a href="logout.php" class="user-dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
                     </div>
-                    <div class="user-avatar" style="background-image: url('<?php echo !empty($user['ProfilePhoto']) ? $user['ProfilePhoto'] : ''; ?>')">
-                        <?php echo empty($user['ProfilePhoto']) ? '<i class="fas fa-user"></i>' : ''; ?>
-                    </div>
+                    <?php else: ?>
+                    <a href="login.php" class="new-topic-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Fazer Login
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -1005,6 +1074,27 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('bannerInput').addEventListener('change', function() {
             document.getElementById('bannerSubmit').click();
         });
+
+        // User dropdown functionality
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Fechar dropdown ao clicar fora
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+            
+            // Prevenir fechamento ao clicar no dropdown
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
 
         // Preview de imagem antes do upload
         function previewImage(input, previewElement) {

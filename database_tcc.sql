@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 22, 2025 at 03:23 PM
+-- Generation Time: Nov 24, 2025 at 03:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -91,6 +91,13 @@ CREATE TABLE `forum_likes` (
   `CreatedAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `forum_likes`
+--
+
+INSERT INTO `forum_likes` (`LikeID`, `PostID`, `CustomerID`, `CreatedAt`) VALUES
+(3, 21, 5, '2025-11-22 21:10:13');
+
 -- --------------------------------------------------------
 
 --
@@ -126,8 +133,10 @@ INSERT INTO `forum_posts` (`PostID`, `TopicID`, `CustomerID`, `PostContent`, `Cr
 (15, 7, 3, 'asasd', '2025-11-22 08:18:00', '2025-11-22 09:27:09', 1, 3, '2025-11-22 09:27:09', 0),
 (16, 7, 3, 'asda', '2025-11-22 08:31:09', '2025-11-22 08:31:09', 0, NULL, NULL, 0),
 (17, 7, 3, 'a', '2025-11-22 09:27:21', '2025-11-22 09:27:21', 0, NULL, NULL, 0),
-(21, 9, 3, 'a', '2025-11-22 11:18:42', '2025-11-22 11:18:42', 0, NULL, NULL, 0),
-(22, 9, 3, 'a', '2025-11-22 11:19:07', '2025-11-22 11:19:07', 0, NULL, NULL, 0);
+(21, 9, 3, 'a', '2025-11-22 11:18:42', '2025-11-22 11:18:42', 0, NULL, NULL, 1),
+(22, 9, 3, 'a', '2025-11-22 11:19:07', '2025-11-22 11:19:07', 0, NULL, NULL, 0),
+(23, 9, 3, 'op', '2025-11-22 20:14:15', '2025-11-22 20:14:15', 0, NULL, NULL, 0),
+(24, 9, 5, 'que supimpa!', '2025-11-22 21:10:09', '2025-11-22 21:10:09', 0, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -163,7 +172,7 @@ INSERT INTO `forum_topics` (`TopicID`, `CategoryID`, `TopicTitle`, `TopicDescrip
 (5, 18, 'estou em busca de jogos bons e baratos', 'alguem tem alguma recomendação?', 3, '2025-11-19 22:54:45', '2025-11-22 10:20:01', 0, 0, 9, 1, 3, '2025-11-19 22:54:45'),
 (7, 13, 'Brawl Stars', 'estou tendo dificuldade no rush de trofeus', 3, '2025-11-19 23:34:16', '2025-11-22 10:03:35', 0, 0, 25, 4, 3, '2025-11-22 09:27:21'),
 (8, 13, 'Brawl Stars', 'ganhei o novo brawler ziggy e queria dicas de como jogar', 3, '2025-11-22 10:04:36', '2025-11-22 10:04:36', 0, 0, 5, 1, 3, '2025-11-22 10:04:36'),
-(9, 13, 'Devil May Cry 5 - Bug do Braço gigante', 'descobri na batalha final de nero contra vergil, se voce tiver gerbera e buster arm voce pode usar a gerbera no momento exato de um dos ataques a sua devil breaker aparece bugada, com a buster arm aberta como se voçe estivesse usando ela', 3, '2025-11-22 10:12:00', '2025-11-22 11:19:07', 0, 0, 14, 3, 3, '2025-11-22 11:19:07'),
+(9, 13, 'Devil May Cry 5 - Bug do Braço gigante', 'descobri na batalha final de nero contra vergil, se voce tiver gerbera e buster arm voce pode usar a gerbera no momento exato de um dos ataques a sua devil breaker aparece bugada, com a buster arm aberta como se voçe estivesse usando ela', 3, '2025-11-22 10:12:00', '2025-11-22 21:10:09', 0, 0, 26, 5, 5, '2025-11-22 21:10:09'),
 (10, 14, 'Red Dead Redemption 2', 'estou jogando a um tempo e queria saber como faço para pegar o crocodilo lendario', 3, '2025-11-22 10:15:05', '2025-11-22 10:15:05', 0, 0, 3, 1, 3, '2025-11-22 10:15:05');
 
 -- --------------------------------------------------------
@@ -205,8 +214,9 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`CustomerID`, `CustomerGmail`, `CustomerName`, `CustomerPassword`, `CustomerHandle`, `CustomerBio`, `ProfileIcon`, `ProfilePhoto`, `CoverPhoto`, `CreatedAt`) VALUES
 (1, 'guilherme@gmail.com', 'masterplan', '$2y$10$sZ9KMLyh4JjucZ4zoBywiOyDqAD.llPJGPU5fW/frFecj0gGkLP62', 'leonjud2', 'eu sou o master plan', '🔥', 'uploads/profiles/profile_1_1763467767.jpg', 'uploads/cover_photos/cover_1_1762871705.gif', '2025-11-11 11:02:26'),
 (2, 'pobre@pobre.com', 'pobre', '$2y$10$oXz6UJ8P6nSQMgjPRPTPBuJqd3e4KJZHM.rd5tRvpc7AFOTspys/W', 'pobre', NULL, '🔥', NULL, NULL, '2025-11-11 11:05:55'),
-(3, 'ze@gmail.com', 'ze', '$2y$10$hIMrkaewCG9Vy2EBdVT61e18bsbGjtYrk0mOb/WlXTf4KMg/oW4P.', 'zebao', 'ze', '?', 'uploads/profiles/profile_3_1763603747.webp', NULL, '2025-11-18 10:26:07'),
-(4, 'pobre2@gmail.com', 'pobre da silva', '$2y$10$Me6PEdx73idNUPwCCfpA0egKn2hGMbkJw8cWkFzIb3mUULIA1xe.C', 'pobre2', 'ola', '?', 'uploads/profiles/profile_4_1763473646.png', NULL, '2025-11-18 10:30:40');
+(3, 'ze@gmail.com', 'ze', '$2y$10$hIMrkaewCG9Vy2EBdVT61e18bsbGjtYrk0mOb/WlXTf4KMg/oW4P.', 'zebao', 'ze', '?', 'uploads/profiles/profile_3_1763853218.webp', NULL, '2025-11-18 10:26:07'),
+(4, 'pobre2@gmail.com', 'pobre da silva', '$2y$10$Me6PEdx73idNUPwCCfpA0egKn2hGMbkJw8cWkFzIb3mUULIA1xe.C', 'pobre2', 'ola', '?', 'uploads/profiles/profile_4_1763473646.png', NULL, '2025-11-18 10:30:40'),
+(5, 'fihdoze@gmail.com', 'fih do ze', '$2y$10$qgiIzccary8WzY0SZdwsIuKGkul2uGTjzxZwb0rP60YT37r3QVi3G', 'fihdoze', NULL, '?', 'uploads/profiles/profile_5_1763855930.png', NULL, '2025-11-22 20:57:05');
 
 --
 -- Indexes for dumped tables
@@ -285,13 +295,13 @@ ALTER TABLE `forum_categories`
 -- AUTO_INCREMENT for table `forum_likes`
 --
 ALTER TABLE `forum_likes`
-  MODIFY `LikeID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `LikeID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `forum_posts`
 --
 ALTER TABLE `forum_posts`
-  MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `forum_topics`
@@ -309,7 +319,7 @@ ALTER TABLE `foruns`
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `CustomerID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `CustomerID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

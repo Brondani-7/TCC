@@ -144,6 +144,73 @@ $totalPages = ceil($totalFangames / $limit);
             --gamejolt-orange: #ff7a33;
         }
         
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--secondary);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .user-dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .user-avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -239,19 +306,6 @@ $totalPages = ceil($totalFangames / $limit);
             display: flex;
             align-items: center;
             gap: 15px;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
         }
         
         /* Search and Filters */
@@ -683,7 +737,7 @@ $totalPages = ceil($totalFangames / $limit);
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="logo">
                 <i class="fas fa-fire"></i>
                 <span>BONFIRE GAMES</span>
@@ -702,17 +756,6 @@ $totalPages = ceil($totalFangames / $limit);
                     <i class="fas fa-users"></i>
                     <span>Fórum</span>
                 </a>
-                <?php if ($user): ?>
-                <a href="perfil.php" class="nav-link">
-                    <i class="fas fa-user"></i>
-                    <span>Perfil</span>
-                </a>
-                <?php else: ?>
-                <a href="login.php" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Login</span>
-                </a>
-                <?php endif; ?>
             </div>
         </div>
         
@@ -722,17 +765,27 @@ $totalPages = ceil($totalFangames / $limit);
                 <div class="page-title">Descobrir Fangames</div>
                 <div class="header-actions">
                     <?php if ($user): ?>
-                    <a href="add_fangame.php" class="search-btn" style="text-decoration: none;">
-                        <i class="fas fa-plus"></i> Publicar Fangame
-                    </a>
-                    <div class="user-avatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
-                        <?php if(empty($user['ProfilePhoto'])): ?>
-                            <i class="fas fa-user"></i>
-                        <?php endif; ?>
+                    <div class="user-avatar-container">
+                        <div class="user-avatar" id="userAvatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
+                            <?php if(empty($user['ProfilePhoto'])): ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="perfil.php" class="user-dropdown-item">
+                                <i class="fas fa-user"></i>
+                                Meu Perfil
+                            </a>
+                            <a href="logout.php" class="user-dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
                     </div>
                     <?php else: ?>
-                    <a href="login.php" class="search-btn" style="text-decoration: none;">
-                        <i class="fas fa-sign-in-alt"></i> Fazer Login
+                    <a href="login.php" class="new-topic-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Fazer Login
                     </a>
                     <?php endif; ?>
                 </div>
@@ -932,6 +985,27 @@ $totalPages = ceil($totalFangames / $limit);
                 this.form.submit();
             });
         });
+
+        // User dropdown functionality
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Fechar dropdown ao clicar fora
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+            
+            // Prevenir fechamento ao clicar no dropdown
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
         
         // Adicionar loading state nos cliques
         document.querySelectorAll('.game-card').forEach(card => {
