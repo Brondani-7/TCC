@@ -275,7 +275,7 @@ function deleteForumTopic($pdo, $topicId, $userId) {
 function getCurrentUser($pdo) {
     if (!isLoggedIn()) return null;
     
-    $stmt = $pdo->prepare("SELECT *, ProfileBanner FROM usuarios WHERE CustomerID = ?");
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE CustomerID = ?");
     $stmt->execute([$_SESSION['customer_id']]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
