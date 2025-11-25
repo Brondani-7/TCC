@@ -1,5 +1,5 @@
 <?php
-// fangames.php - Versão Refatorada
+// fangames.php - Versão Integrada com Banco de Dados
 require_once 'config.php';
 
 // Verificar se o usuário está logado e obter dados
@@ -22,62 +22,33 @@ $fangames = [];
 $totalFangames = 0;
 
 try {
-    // Construir query base
-    $query = "SELECT f.*, u.CustomerName, u.CustomerHandle, u.ProfilePhoto 
-              FROM fangames f 
-              JOIN usuarios u ON f.DeveloperID = u.CustomerID 
-              WHERE 1=1";
+    // Construir query base usando a função do config.php
+    $fangames = searchFangames($pdo, $search, $franchise, $genre, $status, $limit, $offset);
     
-    $params = [];
-    
-    // Aplicar filtros
-    if (!empty($search)) {
-        $query .= " AND (f.GameTitle LIKE ? OR f.GameDescription LIKE ?)";
-        $searchTerm = "%$search%";
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
-    }
-    
-    if (!empty($franchise)) {
-        $query .= " AND f.Franchise = ?";
-        $params[] = $franchise;
-    }
-    
-    if (!empty($genre)) {
-        $query .= " AND f.Genre = ?";
-        $params[] = $genre;
-    }
-    
-    if (!empty($status)) {
-        $query .= " AND f.Status = ?";
-        $params[] = $status;
-    }
-    
-    // Ordenar por data de criação (mais recentes primeiro)
-    $query .= " ORDER BY f.CreatedAt DESC";
-    
-    // Query para contar total (sem paginação)
-    $countQuery = "SELECT COUNT(*) FROM fangames f WHERE 1=1";
+    // Contar total de fangames (para paginação)
+    $countQuery = "SELECT COUNT(*) FROM fangames WHERE 1=1";
     $countParams = [];
     
     if (!empty($search)) {
-        $countQuery .= " AND (f.GameTitle LIKE ? OR f.GameDescription LIKE ?)";
-        $countParams[] = "%$search%";
-        $countParams[] = "%$search%";
+        $countQuery .= " AND (GameTitle LIKE ? OR GameDescription LIKE ? OR Tags LIKE ?)";
+        $searchTerm = "%$search%";
+        $countParams[] = $searchTerm;
+        $countParams[] = $searchTerm;
+        $countParams[] = $searchTerm;
     }
     
     if (!empty($franchise)) {
-        $countQuery .= " AND f.Franchise = ?";
+        $countQuery .= " AND Franchise = ?";
         $countParams[] = $franchise;
     }
     
     if (!empty($genre)) {
-        $countQuery .= " AND f.Genre = ?";
+        $countQuery .= " AND Genre = ?";
         $countParams[] = $genre;
     }
     
     if (!empty($status)) {
-        $countQuery .= " AND f.Status = ?";
+        $countQuery .= " AND Status = ?";
         $countParams[] = $status;
     }
     
@@ -86,36 +57,14 @@ try {
     $stmt->execute($countParams);
     $totalFangames = $stmt->fetchColumn();
     
-    // Adicionar paginação à query principal
-    $query .= " LIMIT ? OFFSET ?";
-    $params[] = $limit;
-    $params[] = $offset;
-    
-    // Executar query principal
-    $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
-    $fangames = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
 } catch (PDOException $e) {
     error_log("Erro ao buscar fangames: " . $e->getMessage());
     $error = "Erro ao carregar fangames. Tente novamente mais tarde.";
 }
 
-// Obter opções de filtro
-$franchises = [];
-$genres = [];
-
-try {
-    // Buscar franquias únicas
-    $stmt = $pdo->query("SELECT DISTINCT Franchise FROM fangames WHERE Franchise IS NOT NULL ORDER BY Franchise");
-    $franchises = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
-    // Buscar gêneros únicos
-    $stmt = $pdo->query("SELECT DISTINCT Genre FROM fangames WHERE Genre IS NOT NULL ORDER BY Genre");
-    $genres = $stmt->fetchAll(PDO::FETCH_COLUMN);
-} catch (PDOException $e) {
-    error_log("Erro ao carregar opções de filtro: " . $e->getMessage());
-}
+// Obter opções de filtro usando funções do config.php
+$franchises = getUniqueFranchises($pdo);
+$genres = getUniqueGenres($pdo);
 
 // Calcular total de páginas
 $totalPages = ceil($totalFangames / $limit);
@@ -467,22 +416,22 @@ $totalPages = ceil($totalFangames / $limit);
             z-index: 2;
         }
         
-        .status-released {
+        .status-lançado {
             background: var(--gamejolt-green);
             color: white;
         }
         
-        .status-development {
+        .status-em-desenvolvimento {
             background: var(--gamejolt-orange);
             color: white;
         }
         
-        .status-paused {
+        .status-pausado {
             background: var(--warning);
             color: white;
         }
         
-        .status-cancelled {
+        .status-cancelado {
             background: var(--danger);
             color: white;
         }
@@ -783,7 +732,7 @@ $totalPages = ceil($totalFangames / $limit);
                         </div>
                     </div>
                     <?php else: ?>
-                    <a href="login.php" class="new-topic-btn">
+                    <a href="login.php" class="search-btn" style="text-decoration: none;">
                         <i class="fas fa-sign-in-alt"></i>
                         Fazer Login
                     </a>
@@ -870,8 +819,10 @@ $totalPages = ceil($totalFangames / $limit);
                         <?php foreach ($fangames as $game): ?>
                         <div class="game-card" onclick="window.location.href='game.php?id=<?php echo $game['GameID']; ?>'">
                             <div class="game-cover">
-                                <?php if (!empty($game['GameCover']) && file_exists($game['GameCover'])): ?>
-                                    <img src="<?php echo htmlspecialchars($game['GameCover']); ?>" 
+                                <?php 
+                                $coverUrl = getGameCover($game);
+                                if (!empty($coverUrl)): ?>
+                                    <img src="<?php echo htmlspecialchars($coverUrl); ?>" 
                                          alt="<?php echo htmlspecialchars($game['GameTitle']); ?>" 
                                          class="game-cover-image"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -894,7 +845,7 @@ $totalPages = ceil($totalFangames / $limit);
                                     <div>
                                         <h3 class="game-title"><?php echo htmlspecialchars($game['GameTitle']); ?></h3>
                                         <div class="game-developer">
-                                            <div class="dev-avatar" style="background-image: url('<?php echo htmlspecialchars($game['ProfilePhoto'] ?? ''); ?>')">
+                                            <div class="dev-avatar" style="background-image: url('<?php echo htmlspecialchars(getDevAvatar($game)); ?>')">
                                                 <?php if(empty($game['ProfilePhoto'])): ?>
                                                     <i class="fas fa-user"></i>
                                                 <?php endif; ?>
@@ -906,7 +857,7 @@ $totalPages = ceil($totalFangames / $limit);
                                 
                                 <p class="game-description">
                                     <?php 
-                                    $description = $game['GameDescription'];
+                                    $description = $game['GameDescription'] ?? 'Sem descrição disponível.';
                                     if (strlen($description) > 150) {
                                         $description = substr($description, 0, 150) . '...';
                                     }
@@ -915,8 +866,8 @@ $totalPages = ceil($totalFangames / $limit);
                                 </p>
                                 
                                 <div class="game-meta">
-                                    <span class="game-franchise"><?php echo htmlspecialchars($game['Franchise']); ?></span>
-                                    <span class="game-genre"><?php echo htmlspecialchars($game['Genre']); ?></span>
+                                    <span class="game-franchise"><?php echo htmlspecialchars($game['Franchise'] ?? 'N/A'); ?></span>
+                                    <span class="game-genre"><?php echo htmlspecialchars($game['Genre'] ?? 'N/A'); ?></span>
                                 </div>
                                 
                                 <div class="game-stats">
