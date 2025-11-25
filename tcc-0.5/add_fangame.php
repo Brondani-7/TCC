@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($success) {
                 $message = "Fangame cadastrado com sucesso!";
                 // Redirecionar após 2 segundos
-                echo "<script>setTimeout(() => window.location.href = 'profile.php', 2000);</script>";
+                echo "<script>setTimeout(() => window.location.href = 'index.php', 2000);</script>";
             } else {
                 $error = "Erro ao cadastrar fangame no banco de dados.";
             }
