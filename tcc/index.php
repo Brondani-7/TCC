@@ -309,6 +309,11 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .hero-section::before {
@@ -328,6 +333,8 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             margin-bottom: 15px;
             color: var(--primary);
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
         }
 
         .hero-subtitle {
@@ -335,6 +342,8 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             color: var(--light);
             margin-bottom: 30px;
             opacity: 0.9;
+            position: relative;
+            z-index: 10;
         }
 
         .hero-stats {
@@ -642,41 +651,68 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             z-index: 1000;
         }
 
-        /* Quick Actions */
+        /* Quick Actions - AUMENTADOS */
         .quick-actions {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
         }
 
         .quick-action {
             background: var(--dark);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 25px 30px;
             text-decoration: none;
             color: var(--light);
             flex: 1;
-            min-width: 150px;
+            min-width: 200px;
             text-align: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .quick-action:hover {
             background: var(--secondary);
             border-color: var(--gamejolt-green);
             color: var(--light);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .quick-action:hover::before {
+            left: 100%;
         }
 
         .action-icon {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
             color: var(--gamejolt-green);
         }
 
         .action-text {
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .action-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 8px;
+            opacity: 0.8;
         }
 
         /* Browser-specific optimizations */
@@ -763,6 +799,62 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             
             .quick-actions {
                 flex-direction: column;
+                gap: 15px;
+            }
+            
+            .quick-action {
+                min-width: auto;
+                padding: 20px;
+            }
+            
+            .bonfire-container {
+                height: 140px;
+                width: 110px;
+            }
+            
+            .bonfire-base {
+                width: 90px;
+                height: 45px;
+            }
+            
+            .log-1, .log-2, .log-3 {
+                width: 10px;
+            }
+            
+            .log-1 {
+                height: 60px;
+                left: 10px;
+            }
+            
+            .log-2 {
+                height: 70px;
+                left: 40px;
+            }
+            
+            .log-3 {
+                height: 55px;
+                left: 70px;
+            }
+            
+            .flame-main {
+                width: 45px;
+                height: 90px;
+                left: 32px;
+                bottom: 45px;
+            }
+            
+            .flame-left {
+                width: 35px;
+                height: 70px;
+                left: 20px;
+                bottom: 45px;
+            }
+            
+            .flame-right {
+                width: 35px;
+                height: 75px;
+                left: 50px;
+                bottom: 45px;
             }
             
             .browser-notification {
@@ -788,6 +880,56 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             
             .hero-subtitle {
                 font-size: 1rem;
+            }
+            
+            .bonfire-container {
+                height: 120px;
+                width: 90px;
+            }
+            
+            .bonfire-base {
+                width: 70px;
+                height: 35px;
+            }
+            
+            .log-1, .log-2, .log-3 {
+                width: 8px;
+            }
+            
+            .log-1 {
+                height: 50px;
+                left: 8px;
+            }
+            
+            .log-2 {
+                height: 55px;
+                left: 31px;
+            }
+            
+            .log-3 {
+                height: 45px;
+                left: 54px;
+            }
+            
+            .flame-main {
+                width: 35px;
+                height: 70px;
+                left: 27px;
+                bottom: 35px;
+            }
+            
+            .flame-left {
+                width: 25px;
+                height: 55px;
+                left: 18px;
+                bottom: 35px;
+            }
+            
+            .flame-right {
+                width: 25px;
+                height: 60px;
+                left: 40px;
+                bottom: 35px;
             }
         }
     </style>
@@ -877,30 +1019,23 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             <div class="hero-section">
                 <h1 class="hero-title">BONFIRE GAMES</h1>
                 <p class="hero-subtitle">Sua comunidade de fangames e discussões sobre jogos</p>
-                
-                <div class="search-container">
-                    <form action="search.php" method="GET">
-                        <input type="text" name="q" placeholder="Buscar tópicos, jogos, usuários..." autocomplete="off" />
-                        <button type="submit">
-                            <i class="fas fa-search"></i> Buscar
-                        </button>
-                    </form>
-                </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Quick Actions - AUMENTADOS -->
             <div class="quick-actions">
                 <a href="forum.php" class="quick-action">
                     <div class="action-icon">
                         <i class="fas fa-comments"></i>
                     </div>
                     <div class="action-text">Ver Todos os Fóruns</div>
+                    <div class="action-description">Participe de discussões e compartilhe ideias</div>
                 </a>
                 <a href="fangames.php" class="quick-action">
                     <div class="action-icon">
                         <i class="fas fa-gamepad"></i>
                     </div>
                     <div class="action-text">Explorar Fangames</div>
+                    <div class="action-description">Descubra e jogue fangames incríveis</div>
                 </a>
             </div>
         </div>

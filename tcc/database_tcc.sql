@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2025 at 12:28 AM
+-- Generation Time: Nov 25, 2025 at 04:25 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -59,7 +59,6 @@ CREATE TABLE `forum_categories` (
 --
 
 INSERT INTO `forum_categories` (`CategoryID`, `CategoryName`, `CategoryDescription`, `CreatedAt`) VALUES
-(1, 'Ação', 'Discussões gerais sobre fangames e comunidade', '2025-11-18 10:51:24'),
 (2, 'Desenvolvimento', 'Dúvidas e discussões sobre desenvolvimento de jogos', '2025-11-18 10:51:24'),
 (3, 'Lançamentos', 'Anúncio de novos fangames lançados', '2025-11-18 10:51:24'),
 (4, 'Feedback', 'Peça e dê feedback sobre projetos', '2025-11-18 10:51:24'),
@@ -138,7 +137,8 @@ INSERT INTO `forum_posts` (`PostID`, `TopicID`, `CustomerID`, `PostContent`, `Cr
 (21, 9, 3, 'a', '2025-11-22 11:18:42', '2025-11-22 11:18:42', 0, NULL, NULL, 1),
 (22, 9, 3, 'a', '2025-11-22 11:19:07', '2025-11-22 11:19:07', 0, NULL, NULL, 1),
 (23, 9, 3, 'op', '2025-11-22 20:14:15', '2025-11-22 20:14:15', 0, NULL, NULL, 1),
-(24, 9, 5, 'que supimpa!', '2025-11-22 21:10:09', '2025-11-22 21:10:09', 0, NULL, NULL, 0);
+(24, 9, 5, 'que supimpa!', '2025-11-22 21:10:09', '2025-11-22 21:10:09', 0, NULL, NULL, 0),
+(25, 11, 5, 'eu ainda nao acredito que isso aconteceu, alguem sabe se tem chance de voltar?', '2025-11-25 00:14:28', '2025-11-25 00:14:28', 0, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -174,8 +174,9 @@ INSERT INTO `forum_topics` (`TopicID`, `CategoryID`, `TopicTitle`, `TopicDescrip
 (5, 18, 'estou em busca de jogos bons e baratos', 'alguem tem alguma recomendação?', 3, '2025-11-19 22:54:45', '2025-11-22 10:20:01', 0, 0, 9, 1, 3, '2025-11-19 22:54:45'),
 (7, 13, 'Brawl Stars', 'estou tendo dificuldade no rush de trofeus', 3, '2025-11-19 23:34:16', '2025-11-22 10:03:35', 0, 0, 25, 4, 3, '2025-11-22 09:27:21'),
 (8, 13, 'Brawl Stars', 'ganhei o novo brawler ziggy e queria dicas de como jogar', 3, '2025-11-22 10:04:36', '2025-11-22 10:04:36', 0, 0, 5, 1, 3, '2025-11-22 10:04:36'),
-(9, 13, 'Devil May Cry 5 - Bug do Braço gigante', 'descobri na batalha final de nero contra vergil, se voce tiver gerbera e buster arm voce pode usar a gerbera no momento exato de um dos ataques a sua devil breaker aparece bugada, com a buster arm aberta como se voçe estivesse usando ela', 3, '2025-11-22 10:12:00', '2025-11-22 21:10:09', 0, 0, 29, 5, 5, '2025-11-22 21:10:09'),
-(10, 14, 'Red Dead Redemption 2', 'estou jogando a um tempo e queria saber como faço para pegar o crocodilo lendario', 3, '2025-11-22 10:15:05', '2025-11-22 10:15:05', 0, 0, 3, 1, 3, '2025-11-22 10:15:05');
+(9, 13, 'Devil May Cry 5 - Bug do Braço gigante', 'descobri na batalha final de nero contra vergil, se voce tiver gerbera e buster arm voce pode usar a gerbera no momento exato de um dos ataques a sua devil breaker aparece bugada, com a buster arm aberta como se voçe estivesse usando ela', 3, '2025-11-22 10:12:00', '2025-11-22 21:10:09', 0, 0, 30, 5, 5, '2025-11-22 21:10:09'),
+(10, 14, 'Red Dead Redemption 2', 'estou jogando a um tempo e queria saber como faço para pegar o crocodilo lendario', 3, '2025-11-22 10:15:05', '2025-11-22 10:15:05', 0, 0, 3, 1, 3, '2025-11-22 10:15:05'),
+(11, 17, 'need for speed', 'servidores de Need for Speed: Rivals desativados.', 5, '2025-11-25 00:14:28', '2025-11-25 00:14:28', 0, 0, 1, 1, 5, '2025-11-25 00:14:28');
 
 -- --------------------------------------------------------
 
@@ -219,7 +220,7 @@ INSERT INTO `usuarios` (`CustomerID`, `CustomerGmail`, `CustomerName`, `Customer
 (2, 'pobre@pobre.com', 'pobre', '$2y$10$oXz6UJ8P6nSQMgjPRPTPBuJqd3e4KJZHM.rd5tRvpc7AFOTspys/W', 'pobre', NULL, '🔥', NULL, NULL, NULL, '2025-11-11 11:05:55'),
 (3, 'ze@gmail.com', 'ze', '$2y$10$hIMrkaewCG9Vy2EBdVT61e18bsbGjtYrk0mOb/WlXTf4KMg/oW4P.', 'zebao', 'ze', '?', 'uploads/profiles/profile_3_1763853218.webp', NULL, NULL, '2025-11-18 10:26:07'),
 (4, 'pobre2@gmail.com', 'pobre da silva', '$2y$10$Me6PEdx73idNUPwCCfpA0egKn2hGMbkJw8cWkFzIb3mUULIA1xe.C', 'pobre2', 'ola', '?', 'uploads/profiles/profile_4_1763473646.png', NULL, NULL, '2025-11-18 10:30:40'),
-(5, 'fihdoze@gmail.com', 'fih do ze', '$2y$10$qgiIzccary8WzY0SZdwsIuKGkul2uGTjzxZwb0rP60YT37r3QVi3G', 'fihdoze', NULL, '?', 'uploads/profiles/profile_5_1763855930.png', 'uploads/banners/banner_5_1764026858.gif', NULL, '2025-11-22 20:57:05');
+(5, 'fihdoze@gmail.com', 'fih do ze', '$2y$10$qgiIzccary8WzY0SZdwsIuKGkul2uGTjzxZwb0rP60YT37r3QVi3G', 'fihdoze', NULL, '?', 'uploads/profiles/profile_5_1763855930.png', 'uploads/banners/banner_5_1764040100.png', NULL, '2025-11-22 20:57:05');
 
 --
 -- Indexes for dumped tables
@@ -304,13 +305,13 @@ ALTER TABLE `forum_likes`
 -- AUTO_INCREMENT for table `forum_posts`
 --
 ALTER TABLE `forum_posts`
-  MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `PostID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `forum_topics`
 --
 ALTER TABLE `forum_topics`
-  MODIFY `TopicID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `TopicID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `foruns`
