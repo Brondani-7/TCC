@@ -18,7 +18,7 @@ incrementTopicViews($pdo, $topicId);
 // Obter posts do tópico
 $posts = getTopicPosts($pdo, $topicId);
 
-// Processar ações via AJAX - CORRIGIDO
+// Processar ações via AJAX
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header('Content-Type: application/json');
     
@@ -36,9 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             case 'edit':
                 if (isset($_POST['post_id']) && isset($_POST['content'])) {
                     $result = editForumPost($pdo, $_POST['post_id'], $_POST['content'], $_SESSION['customer_id']);
-                    $response = $result;
-                } else {
-                    $response = ['success' => false, 'error' => 'Dados incompletos para edição'];
+                    $response = ['success' => $result];
                 }
                 break;
                 
@@ -51,27 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }
                 break;
-                
-            case 'edit_topic':
-                if (isset($_POST['title']) && isset($_POST['description'])) {
-                    $result = editForumTopic($pdo, $topicId, $_POST['title'], $_POST['description'], $_SESSION['customer_id']);
-                    $response = $result;
-                    if ($result['success']) {
-                        $response['redirect'] = "topic.php?id=$topicId";
-                    }
-                }
-                break;
-                
-            case 'delete_topic':
-                $result = deleteForumTopic($pdo, $topicId, $_SESSION['customer_id']);
-                $response = ['success' => $result];
-                if ($result) {
-                    $response['redirect'] = "category.php?id=" . $topic['CategoryID'];
-                }
-                break;
-                
-            default:
-                $response = ['success' => false, 'error' => 'Ação desconhecida'];
         }
         
         echo json_encode($response);
@@ -106,9 +83,6 @@ if ($user && !empty($posts)) {
     }
     unset($post); // Quebrar referência
 }
-
-// Verificar se o usuário atual é o criador do tópico
-$isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -128,130 +102,10 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
             --success: #2ecc71;
             --warning: #f39c12;
             --danger: #e74c3c;
-            --gamejolt-blue: #191b21;
             --gamejolt-green: #6bc679;
             --gamejolt-purple: #8b6bc6;
         }
         
-        /* Adicione ao CSS existente */
-        .edited-indicator {
-            color: var(--gray);
-            font-size: 0.8rem;
-        }
-
-        .edit-form {
-            transition: all 0.3s ease;
-        }
-
-        .save-btn.success {
-            background: var(--success) !important;
-        }
-
-        /* Loading state para botões */
-        .btn-loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        .btn-loading::after {
-            content: '...';
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-
-        /* Ações do tópico */
-        .topic-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .topic-action-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .edit-topic-btn {
-            background: rgba(243, 156, 18, 0.2);
-            color: var(--warning);
-            border: 1px solid var(--warning);
-        }
-
-        .edit-topic-btn:hover {
-            background: var(--warning);
-            color: white;
-        }
-
-        .delete-topic-btn {
-            background: rgba(231, 76, 60, 0.2);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
-
-        .delete-topic-btn:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* Modal de edição de tópico */
-        .topic-edit-modal {
-            display: none;
-        }
-
-        .topic-edit-form {
-            background: var(--dark);
-            padding: 25px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border-left: 4px solid var(--warning);
-        }
-
-        .topic-edit-form .form-group {
-            margin-bottom: 20px;
-        }
-
-        .topic-edit-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--light);
-        }
-
-        .topic-edit-form input,
-        .topic-edit-form textarea {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            color: var(--light);
-            outline: none;
-        }
-
-        .topic-edit-form textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .topic-edit-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -260,7 +114,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
         }
         
         body {
-            background-color: var(--gamejolt-blue);
+            background-color: var(--secondary);
             color: var(--light);
             line-height: 1.6;
         }
@@ -273,7 +127,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
         /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: var(--secondary);
+            background-color: var(--dark);
             padding: 20px;
             position: fixed;
             height: 100vh;
@@ -386,12 +240,11 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
         
         /* Topic Header */
         .topic-header {
-            background: var(--secondary);
+            background: var(--dark);
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 25px;
             border-left: 4px solid var(--gamejolt-green);
-            position: relative;
         }
         
         .topic-title {
@@ -645,7 +498,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
         
         /* Reply Form */
         .reply-section {
-            background: var(--secondary);
+            background: var(--dark);
             border-radius: 10px;
             padding: 25px;
             margin-top: 30px;
@@ -875,10 +728,6 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                 flex-wrap: wrap;
                 justify-content: center;
             }
-
-            .topic-actions {
-                flex-direction: column;
-            }
         }
         
         @media (max-width: 480px) {
@@ -960,7 +809,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
             
             <!-- Tópico Header -->
             <div class="topic-header">
-                <h1 class="topic-title" id="topic-title-display">
+                <h1 class="topic-title">
                     <?php if ($topic['IsSticky']): ?>
                     <span class="sticky-badge"><i class="fas fa-thumbtack"></i> Fixado</span>
                     <?php endif; ?>
@@ -971,7 +820,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                 </h1>
                 
                 <?php if (!empty($topic['TopicDescription'])): ?>
-                <p class="topic-description" id="topic-description-display"><?= htmlspecialchars($topic['TopicDescription']) ?></p>
+                <p class="topic-description"><?= htmlspecialchars($topic['TopicDescription']) ?></p>
                 <?php endif; ?>
                 
                 <div class="topic-meta">
@@ -992,42 +841,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                         <span><?= $topic['ReplyCount'] ?> respostas</span>
                     </div>
                 </div>
-
-                <!-- Ações do Tópico (apenas para o criador) -->
-                <?php if ($isTopicOwner): ?>
-                <div class="topic-actions">
-                    <button class="topic-action-btn edit-topic-btn" onclick="startEditTopic()">
-                        <i class="fas fa-edit"></i>
-                        Editar Tópico
-                    </button>
-                    <button class="topic-action-btn delete-topic-btn" onclick="confirmDeleteTopic()">
-                        <i class="fas fa-trash"></i>
-                        Deletar Tópico
-                    </button>
-                </div>
-                <?php endif; ?>
             </div>
-
-            <!-- Formulário de Edição do Tópico (inicialmente oculto) -->
-            <?php if ($isTopicOwner): ?>
-            <div class="topic-edit-form" id="topic-edit-form" style="display: none;">
-                <h3><i class="fas fa-edit"></i> Editar Tópico</h3>
-                <form id="edit-topic-form">
-                    <div class="form-group">
-                        <label for="edit-topic-title">Título do Tópico</label>
-                        <input type="text" id="edit-topic-title" name="title" value="<?= htmlspecialchars($topic['TopicTitle']) ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-topic-description">Descrição (opcional)</label>
-                        <textarea id="edit-topic-description" name="description"><?= htmlspecialchars($topic['TopicDescription'] ?? '') ?></textarea>
-                    </div>
-                    <div class="topic-edit-actions">
-                        <button type="button" class="cancel-btn" onclick="cancelEditTopic()">Cancelar</button>
-                        <button type="submit" class="save-btn">Salvar Alterações</button>
-                    </div>
-                </form>
-            </div>
-            <?php endif; ?>
             
             <!-- Posts -->
             <div class="posts-container">
@@ -1071,7 +885,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                             
                             <div class="post-actions">
                                 <button class="post-action like-action <?= $post['HasLiked'] ? 'liked' : '' ?>" 
-                                        onclick="toggleLike(<?= $post['PostID'] ?>, this)">
+                                        data-post-id="<?= (int)$post['PostID'] ?>">
                                     <i class="fas fa-thumbs-up"></i>
                                     <span class="like-count"><?= $post['LikesCount'] ?? 0 ?></span>
                                 </button>
@@ -1143,7 +957,7 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Delete do Post -->
+    <!-- Modal de Confirmação de Delete -->
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <h3 style="margin-bottom: 15px; color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h3>
@@ -1155,150 +969,8 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Delete do Tópico -->
-    <div class="modal" id="deleteTopicModal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 15px; color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão do Tópico</h3>
-            <p style="margin-bottom: 20px; color: var(--light);">Tem certeza que deseja deletar este tópico? Todos os posts serão perdidos e esta ação não pode ser desfeita.</p>
-            <div class="modal-actions">
-                <button class="modal-cancel" onclick="closeDeleteTopicModal()">Cancelar</button>
-                <button class="modal-confirm" id="confirmDeleteTopicBtn">Deletar Tópico</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         let postToDelete = null;
-
-        // =============================================
-        // FUNÇÕES PARA EDIÇÃO E DELEÇÃO DO TÓPICO
-        // =============================================
-
-        // Iniciar edição do tópico
-        function startEditTopic() {
-            const topicHeader = document.querySelector('.topic-header');
-            const editForm = document.getElementById('topic-edit-form');
-            
-            topicHeader.style.display = 'none';
-            editForm.style.display = 'block';
-            
-            // Focar no título
-            document.getElementById('edit-topic-title').focus();
-        }
-
-        // Cancelar edição do tópico
-        function cancelEditTopic() {
-            const topicHeader = document.querySelector('.topic-header');
-            const editForm = document.getElementById('topic-edit-form');
-            
-            topicHeader.style.display = 'block';
-            editForm.style.display = 'none';
-        }
-
-        // Salvar edição do tópico
-        async function saveEditTopic(event) {
-            event.preventDefault();
-            
-            const title = document.getElementById('edit-topic-title').value.trim();
-            const description = document.getElementById('edit-topic-description').value.trim();
-            
-            if (!title) {
-                alert('O título do tópico é obrigatório.');
-                return;
-            }
-            
-            try {
-                const response = await fetch('topic.php?id=<?= $topicId ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=edit_topic&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Atualizar display
-                    document.getElementById('topic-title-display').innerHTML = 
-                        document.getElementById('topic-title-display').innerHTML.replace(
-                            /(?<=<\/span>).*$/, 
-                            title
-                        );
-                    
-                    const descriptionDisplay = document.getElementById('topic-description-display');
-                    if (description) {
-                        if (descriptionDisplay) {
-                            descriptionDisplay.textContent = description;
-                        } else {
-                            // Criar elemento de descrição se não existir
-                            const titleElement = document.getElementById('topic-title-display');
-                            const newDescription = document.createElement('p');
-                            newDescription.className = 'topic-description';
-                            newDescription.id = 'topic-description-display';
-                            newDescription.textContent = description;
-                            titleElement.parentNode.insertBefore(newDescription, titleElement.nextSibling);
-                        }
-                    } else if (descriptionDisplay) {
-                        descriptionDisplay.remove();
-                    }
-                    
-                    // Esconder formulário, mostrar header
-                    cancelEditTopic();
-                    
-                    // Feedback de sucesso
-                    showAlert('Tópico atualizado com sucesso!', 'success');
-                    
-                } else {
-                    alert('Erro ao editar o tópico: ' + (result.error || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro de conexão ao editar o tópico.');
-            }
-        }
-
-        // Confirmar deleção do tópico
-        function confirmDeleteTopic() {
-            document.getElementById('deleteTopicModal').style.display = 'flex';
-        }
-
-        // Fechar modal de delete do tópico
-        function closeDeleteTopicModal() {
-            document.getElementById('deleteTopicModal').style.display = 'none';
-        }
-
-        // Executar deleção do tópico
-        async function executeDeleteTopic() {
-            try {
-                const response = await fetch('topic.php?id=<?= $topicId ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=delete_topic`
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    if (result.redirect) {
-                        window.location.href = result.redirect;
-                    }
-                } else {
-                    alert('Erro ao deletar o tópico.');
-                    closeDeleteTopicModal();
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao deletar o tópico.');
-                closeDeleteTopicModal();
-            }
-        }
-
-        // =============================================
-        // FUNÇÕES EXISTENTES (mantidas do código original)
-        // =============================================
 
         // Função para curtir/descurtir
         async function toggleLike(postId, button) {
@@ -1358,17 +1030,9 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
             postText.style.display = 'none';
             editForm.style.display = 'block';
             
-            // Preencher textarea com o conteúdo atual
-            const currentContent = postText.textContent || postText.innerText;
-            editTextarea.value = currentContent;
-            
-            // Focar e selecionar todo o texto
+            // Focar no textarea
             editTextarea.focus();
-            editTextarea.setSelectionRange(0, editTextarea.value.length);
-            
-            // Auto-expand textarea
-            editTextarea.style.height = 'auto';
-            editTextarea.style.height = (editTextarea.scrollHeight) + 'px';
+            editTextarea.setSelectionRange(editTextarea.value.length, editTextarea.value.length);
         }
 
         // Função para cancelar edição
@@ -1404,42 +1068,37 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                 
                 if (result.success) {
                     // Atualizar conteúdo
-                    postText.innerHTML = newContent.replace(/\n/g, '<br>');
+                    postText.textContent = newContent;
                     
                     // Esconder formulário, mostrar texto
                     postText.style.display = 'block';
                     document.getElementById(`edit-form-${postId}`).style.display = 'none';
                     
-                    // Adicionar/atualizar indicador de edição
+                    // Adicionar indicador de edição se não existir
                     const postMeta = postText.closest('.post-content').querySelector('.post-meta');
-                    let editedIndicator = postMeta.querySelector('.edited-indicator');
-                    
-                    if (!editedIndicator) {
-                        editedIndicator = document.createElement('span');
-                        editedIndicator.className = 'edited-indicator';
-                        editedIndicator.innerHTML = ' <i class="fas fa-edit"></i> Editado agora';
-                        postMeta.appendChild(editedIndicator);
-                    } else {
-                        editedIndicator.innerHTML = ' <i class="fas fa-edit"></i> Editado agora';
+                    if (!postMeta.querySelector('.edited-indicator')) {
+                        const editedSpan = document.createElement('span');
+                        editedSpan.innerHTML = '<i class="fas fa-edit"></i> Editado agora';
+                        editedSpan.className = 'edited-indicator';
+                        postMeta.appendChild(editedSpan);
                     }
                     
-                    // Feedback visual de sucesso
+                    // Feedback visual
                     const saveBtn = event.target;
-                    const originalText = saveBtn.textContent;
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Salvo!';
-                    saveBtn.style.background = 'var(--success)';
+                    saveBtn.textContent = 'Salvo!';
+                    saveBtn.style.background = 'var(--gamejolt-green)';
                     
                     setTimeout(() => {
-                        saveBtn.innerHTML = originalText;
+                        saveBtn.textContent = 'Salvar';
                         saveBtn.style.background = '';
                     }, 2000);
                     
                 } else {
-                    alert('Erro ao editar o post: ' + (result.error || 'Erro desconhecido'));
+                    alert('Erro ao editar o post.');
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                alert('Erro de conexão ao editar o post.');
+                alert('Erro ao editar o post.');
             }
         }
 
@@ -1527,19 +1186,6 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
             });
         }
 
-        // Função para mostrar alerta
-        function showAlert(message, type = 'success') {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i> ${message}`;
-            
-            document.querySelector('.main-content').insertBefore(alert, document.querySelector('.breadcrumb').nextSibling);
-            
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Auto-expand textarea
@@ -1551,34 +1197,20 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                 });
             }
             
-            // Configurar formulário de edição do tópico
-            const editTopicForm = document.getElementById('edit-topic-form');
-            if (editTopicForm) {
-                editTopicForm.addEventListener('submit', saveEditTopic);
-            }
-            
-            // Configurar botões de confirmação
+            // Configurar botão de confirmação de delete
             document.getElementById('confirmDeleteBtn').addEventListener('click', executeDelete);
-            document.getElementById('confirmDeleteTopicBtn').addEventListener('click', executeDeleteTopic);
             
-            // Fechar modais ao clicar fora
+            // Fechar modal ao clicar fora
             document.getElementById('deleteModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeDeleteModal();
                 }
             });
             
-            document.getElementById('deleteTopicModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeDeleteTopicModal();
-                }
-            });
-            
-            // Fechar modais com ESC
+            // Fechar modal com ESC
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeDeleteModal();
-                    closeDeleteTopicModal();
                 }
             });
         });
@@ -1599,6 +1231,43 @@ $isTopicOwner = $user && $user['CustomerID'] == $topic['CustomerID'];
                     }, 100);
                 }
             }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-expand textarea
+            const textarea = document.querySelector('textarea[name="post_content"]');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+            
+            // Configurar botão de confirmação de delete
+            document.getElementById('confirmDeleteBtn').addEventListener('click', executeDelete);
+            
+            // Fechar modal ao clicar fora
+            document.getElementById('deleteModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteModal();
+                }
+            });
+            
+            // Fechar modal com ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDeleteModal();
+                }
+            });
+
+            // Registrar listener para botões de like (delegação)
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.like-action');
+                if (!btn) return;
+                const postId = parseInt(btn.getAttribute('data-post-id'), 10);
+                if (!isNaN(postId)) {
+                    toggleLike(postId, btn);
+                }
+            });
         });
     </script>
 </body>
