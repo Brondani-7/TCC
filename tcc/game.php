@@ -2,59 +2,62 @@
 // game.php - Página de detalhes do fangame
 require_once 'config.php';
 
-// Verificar se o ID do jogo foi fornecido
-$gameId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if (!$gameId) {
+
+// Verificar se o ID do jogo foi passado
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: fangames.php');
     exit;
 }
 
-// Buscar dados do jogo
-$game = null;
-$developer = null;
-$relatedGames = [];
 
-try {
-    // Buscar informações do jogo
-    $stmt = $pdo->prepare("
-        SELECT f.*, u.CustomerName, u.CustomerHandle, u.ProfilePhoto, u.CustomerBio
-        FROM fangames f 
-        JOIN usuarios u ON f.DeveloperID = u.CustomerID 
-        WHERE f.GameID = ?
-    ");
-    $stmt->execute([$gameId]);
-    $game = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$game) {
-        header('Location: fangames.php');
-        exit;
-    }
-    
-    // Buscar jogos relacionados (mesma franquia ou gênero)
-    $stmt = $pdo->prepare("
-        SELECT f.GameID, f.GameTitle, f.GameCover, f.Franchise, f.Genre, f.Status, 
-               u.CustomerName, u.CustomerHandle
-        FROM fangames f 
-        JOIN usuarios u ON f.DeveloperID = u.CustomerID 
-        WHERE f.GameID != ? AND (f.Franchise = ? OR f.Genre = ?)
-        ORDER BY f.CreatedAt DESC 
-        LIMIT 4
-    ");
-    $stmt->execute([$gameId, $game['Franchise'], $game['Genre']]);
-    $relatedGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Incrementar contador de visualizações
-    $stmt = $pdo->prepare("UPDATE fangames SET Downloads = Downloads + 1 WHERE GameID = ?");
-    $stmt->execute([$gameId]);
-    
-} catch (PDOException $e) {
-    error_log("Erro ao carregar jogo: " . $e->getMessage());
-    $error = "Erro ao carregar informações do jogo.";
+$gameId = intval($_GET['id']);
+
+// Buscar informações do jogo
+$game = getFangame($pdo, $gameId);
+
+if (!$game) {
+    header('Location: fangames.php');
+    exit;
 }
 
-// Verificar se usuário está logado
-$user = isLoggedIn() ? getCurrentUser($pdo) : null;
-$isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
+// Verificar se o usuário está logado
+$user = null;
+if (isLoggedIn()) {
+    $user = getCurrentUser($pdo);
+}
+
+// Verificar se é o desenvolvedor do jogo
+$isDeveloper = false;
+if ($user) {
+    $isDeveloper = isGameDeveloper($pdo, $gameId, $user['CustomerID']);
+}
+
+// Processar download
+if (isset($_GET['download']) && $user) {
+    if (incrementDownloads($pdo, $gameId)) {
+        // Redirecionar para o link de download
+        if (!empty($game['DownloadLink'])) {
+            header('Location: ' . $game['DownloadLink']);
+            exit;
+        } elseif (!empty($game['GameFile'])) {
+            // Forçar download do arquivo
+            $filePath = $game['GameFile'];
+            if (file_exists($filePath)) {
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+                header('Content-Length: ' . filesize($filePath));
+                readfile($filePath);
+                exit;
+            }
+        }
+    }
+}
+
+// Buscar screenshots (simulado por enquanto)
+$screenshots = getGameScreenshots($pdo, $gameId);
+
+// Incrementar visualizações (opcional)
+// incrementGameViews($pdo, $gameId);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -188,155 +191,153 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
             cursor: pointer;
             background-size: cover;
             background-position: center;
+            position: relative;
         }
         
-        /* Game Hero Section */
-        .game-hero {
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--secondary);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 180px;
+            z-index: 1000;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .user-dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .user-avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Game Header */
+        .game-header {
             display: grid;
-            grid-template-columns: 1fr 400px;
+            grid-template-columns: 300px 1fr;
             gap: 30px;
             margin-bottom: 40px;
         }
         
-        .game-cover-large {
-            border-radius: 15px;
-            overflow: hidden;
-            background: linear-gradient(135deg, var(--gamejolt-purple), var(--gamejolt-orange));
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .game-cover-section {
+            position: relative;
         }
         
-        .game-cover-large img {
+        .game-cover {
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-cover img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        .game-cover-large .image-fallback {
-            font-size: 4rem;
-            color: white;
-        }
-        
-        .game-info-sidebar {
-            background: var(--secondary);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .game-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .btn {
-            padding: 15px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
+        .game-cover-fallback {
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            text-align: center;
-        }
-        
-        .btn-primary {
-            background: var(--gamejolt-green);
+            background: linear-gradient(135deg, var(--gamejolt-purple), var(--gamejolt-orange));
             color: white;
+            font-size: 4rem;
         }
         
-        .btn-primary:hover {
-            background: #5ab869;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-        
-        .game-meta {
-            margin-bottom: 25px;
-        }
-        
-        .meta-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .meta-label {
-            color: var(--gray);
-            font-weight: 500;
-        }
-        
-        .meta-value {
-            color: var(--light);
-            font-weight: 600;
-        }
-        
-        .status-badge {
-            padding: 6px 12px;
+        .game-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: bold;
             text-transform: uppercase;
+            z-index: 2;
         }
         
-        .status-released {
+        .status-lançado {
             background: var(--gamejolt-green);
             color: white;
         }
         
-        .status-development {
+        .status-em-desenvolvimento {
             background: var(--gamejolt-orange);
             color: white;
         }
         
-        .status-paused {
+        .status-pausado {
             background: var(--warning);
             color: white;
         }
         
-        .status-cancelled {
+        .status-cancelado {
             background: var(--danger);
             color: white;
         }
         
-        .developer-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .game-info-section {
             padding: 20px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .developer-avatar {
-            width: 50px;
-            height: 50px;
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--light);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        .game-developer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .dev-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--primary);
             background-size: cover;
@@ -344,25 +345,116 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1rem;
+            color: white;
         }
         
-        .developer-details h4 {
+        .dev-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dev-name {
             color: var(--light);
-            margin-bottom: 5px;
+            font-weight: 500;
         }
         
-        .developer-details p {
+        .dev-handle {
             color: var(--gray);
             font-size: 0.9rem;
         }
         
-        /* Game Details Section */
-        .game-details {
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
             background: var(--secondary);
-            border-radius: 15px;
+            border-radius: 12px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--gamejolt-green);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        .game-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .meta-tag {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--light);
+        }
+        
+        .download-section {
+            margin-top: 30px;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: var(--gamejolt-green);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: #5ab869;
+            transform: translateY(-2px);
+        }
+        
+        .download-btn.disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-prompt {
+            background: var(--secondary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        /* Game Content */
+        .game-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .game-description-section {
+            background: var(--secondary);
             padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 30px;
         }
         
         .section-title {
@@ -375,188 +467,205 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
         }
         
         .game-description {
-            color: var(--light);
             line-height: 1.8;
-            margin-bottom: 30px;
+            color: var(--light);
+            font-size: 1.1rem;
         }
         
         .game-description p {
             margin-bottom: 15px;
         }
         
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        /* Screenshots Section */
+        .screenshots-section {
+            background: var(--secondary);
+            padding: 30px;
+            border-radius: 15px;
             margin-bottom: 30px;
         }
         
-        .tag {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--light);
-        }
-        
-        .system-requirements {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid var(--gamejolt-green);
-        }
-        
-        .system-requirements h4 {
-            color: var(--gamejolt-green);
-            margin-bottom: 15px;
-        }
-        
-        .system-requirements pre {
-            color: var(--light);
-            white-space: pre-wrap;
-            font-family: inherit;
-            line-height: 1.6;
-        }
-        
-        /* Related Games */
-        .related-games {
-            margin-bottom: 40px;
-        }
-        
-        .games-grid {
+        .screenshots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
         
-        .related-game-card {
-            background: var(--secondary);
-            border-radius: 10px;
+        .screenshot-item {
+            border-radius: 8px;
             overflow: hidden;
-            transition: all 0.3s ease;
             cursor: pointer;
+            transition: transform 0.3s ease;
         }
         
-        .related-game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        .screenshot-item:hover {
+            transform: scale(1.05);
         }
         
-        .related-game-cover {
-            height: 150px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, var(--gamejolt-purple), var(--gamejolt-orange));
-        }
-        
-        .related-game-cover img {
+        .screenshot-item img {
             width: 100%;
-            height: 100%;
+            height: 150px;
             object-fit: cover;
         }
         
-        .related-game-info {
-            padding: 15px;
-        }
-        
-        .related-game-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--light);
-            margin-bottom: 8px;
-        }
-        
-        .related-game-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-        
-        /* Comments Section */
-        .comments-section {
+        /* System Requirements */
+        .requirements-section {
             background: var(--secondary);
-            border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .comment-form {
+            border-radius: 15px;
             margin-bottom: 30px;
         }
         
-        .comment-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: var(--light);
-            resize: vertical;
-            min-height: 100px;
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .requirements-column h4 {
+            color: var(--gamejolt-green);
             margin-bottom: 15px;
+            font-size: 1.1rem;
         }
         
-        .comment-input:focus {
-            outline: none;
-            border-color: var(--gamejolt-green);
+        .requirement-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
         }
         
-        .comments-list {
+        .requirement-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .requirement-value {
+            color: var(--light);
+            font-weight: 500;
+        }
+        
+        /* Sidebar Info */
+        .game-sidebar {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
         
-        .comment {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
+        .info-card {
+            background: var(--secondary);
+            padding: 25px;
+            border-radius: 15px;
         }
         
-        .comment-header {
+        .info-list {
+            list-style: none;
+        }
+        
+        .info-item {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .comment-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: var(--primary);
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
+        .info-item:last-child {
+            border-bottom: none;
         }
         
-        .comment-author {
-            font-weight: bold;
-            color: var(--light);
-        }
-        
-        .comment-date {
+        .info-label {
             color: var(--gray);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
         }
         
-        .comment-content {
+        .info-value {
             color: var(--light);
-            line-height: 1.6;
+            font-weight: 500;
+            text-align: right;
+        }
+        
+        .tags-section {
+            background: var(--secondary);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tag {
+            padding: 6px 12px;
+            background: rgba(107, 198, 121, 0.2);
+            color: var(--gamejolt-green);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(107, 198, 121, 0.3);
+        }
+        
+        /* Developer Actions */
+        .developer-actions {
+            background: var(--secondary);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .action-btn.edit {
+            background: var(--gamejolt-orange);
+        }
+        
+        .action-btn.edit:hover {
+            background: #e6692a;
+        }
+        
+        .action-btn.delete {
+            background: var(--danger);
+        }
+        
+        .action-btn.delete:hover {
+            background: #c0392b;
         }
         
         /* Responsive */
         @media (max-width: 1200px) {
-            .game-hero {
+            .game-header {
                 grid-template-columns: 1fr;
             }
             
-            .game-info-sidebar {
-                order: -1;
+            .game-cover {
+                height: 300px;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .game-content {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -573,26 +682,24 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
             .main-content {
                 margin-left: 80px;
             }
+            
+            .requirements-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
-            .games-grid {
+            .game-stats {
                 grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
                 gap: 15px;
-                align-items: flex-start;
             }
             
-            .header-actions {
-                width: 100%;
-                justify-content: flex-end;
+            .game-title {
+                font-size: 2rem;
             }
             
-            .game-actions {
-                flex-direction: column;
+            .screenshots-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
         }
         
@@ -601,12 +708,19 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
                 padding: 15px;
             }
             
-            .game-details, .comments-section {
-                padding: 20px;
+            .game-cover {
+                height: 250px;
             }
             
-            .developer-info {
+            .game-title {
+                font-size: 1.8rem;
+            }
+            
+            .action-buttons {
                 flex-direction: column;
+            }
+            
+            .action-btn {
                 text-align: center;
             }
         }
@@ -615,7 +729,7 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="logo">
                 <i class="fas fa-fire"></i>
                 <span>BONFIRE GAMES</span>
@@ -634,316 +748,321 @@ $isDeveloper = $user && $user['CustomerID'] == $game['DeveloperID'];
                     <i class="fas fa-users"></i>
                     <span>Fórum</span>
                 </a>
-                <?php if ($user): ?>
-                <a href="profile.php" class="nav-link">
-                    <i class="fas fa-user"></i>
-                    <span>Perfil</span>
-                </a>
-                <?php else: ?>
-                <a href="login.php" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Login</span>
-                </a>
-                <?php endif; ?>
             </div>
         </div>
         
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main-content">  
             <div class="header">
-                <div class="page-title"><?php echo htmlspecialchars($game['GameTitle']); ?></div>
+                <div class="page-title">Detalhes do Fangame</div>
                 <div class="header-actions">
                     <?php if ($user): ?>
-                    <a href="fangames.php" class="btn btn-secondary" style="text-decoration: none;">
-                        <i class="fas fa-arrow-left"></i> Voltar
-                    </a>
-                    <?php if ($isDeveloper): ?>
-                    <a href="edit_game.php?id=<?php echo $gameId; ?>" class="btn btn-secondary" style="text-decoration: none;">
-                        <i class="fas fa-edit"></i> Editar
-                    </a>
-                    <?php endif; ?>
-                    <div class="user-avatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
-                        <?php if(empty($user['ProfilePhoto'])): ?>
-                            <i class="fas fa-user"></i>
-                        <?php endif; ?>
+                    <div class="user-avatar-container">
+                        <div class="user-avatar" id="userAvatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
+                            <?php if(empty($user['ProfilePhoto'])): ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="perfil.php" class="user-dropdown-item">
+                                <i class="fas fa-user"></i>
+                                Meu Perfil
+                            </a>
+                            <a href="logout.php" class="user-dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
                     </div>
                     <?php else: ?>
-                    <a href="login.php" class="btn btn-primary" style="text-decoration: none;">
-                        <i class="fas fa-sign-in-alt"></i> Fazer Login
+                    <a href="login.php" class="download-btn" style="text-decoration: none; font-size: 1rem;">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Fazer Login
                     </a>
                     <?php endif; ?>
                 </div>
             </div>
             
-            <!-- Game Hero Section -->
-            <div class="game-hero">
-                <div class="game-info-sidebar">
-                    <div class="game-actions">
-                        <?php if ($game['GameFile'] || $game['DownloadLink']): ?>
-                        <a href="<?php echo $game['GameFile'] ? htmlspecialchars($game['GameFile']) : htmlspecialchars($game['DownloadLink']); ?>" 
-                           class="btn btn-primary" target="_blank" download>
-                            <i class="fas fa-download"></i> Baixar Jogo
-                        </a>
+            <!-- Game Header -->
+            <div class="game-header">
+                <div class="game-cover-section">
+                    <div class="game-cover">
+                        <?php 
+                        $coverUrl = getGameCover($game);
+                        if (!empty($coverUrl)): ?>
+                            <img src="<?php echo htmlspecialchars($coverUrl); ?>" 
+                                 alt="<?php echo htmlspecialchars($game['GameTitle']); ?>"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="game-cover-fallback" style="display: none;">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                        <?php else: ?>
+                            <div class="game-cover-fallback">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
                         <?php endif; ?>
                         
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-star"></i> Avaliar
-                        </button>
-                        
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-share"></i> Compartilhar
-                        </button>
-                        
-                        <?php if ($isDeveloper): ?>
-                        <button class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Excluir Jogo
-                        </button>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="game-meta">
-                        <div class="meta-item">
-                            <span class="meta-label">Status</span>
-                            <span class="meta-value status-badge status-<?php echo strtolower(str_replace(' ', '-', $game['Status'])); ?>">
-                                <?php echo htmlspecialchars($game['Status']); ?>
-                            </span>
-                        </div>
-                        
-                        <div class="meta-item">
-                            <span class="meta-label">Franquia</span>
-                            <span class="meta-value"><?php echo htmlspecialchars($game['Franchise']); ?></span>
-                        </div>
-                        
-                        <div class="meta-item">
-                            <span class="meta-label">Gênero</span>
-                            <span class="meta-value"><?php echo htmlspecialchars($game['Genre']); ?></span>
-                        </div>
-                        
-                        <?php if ($game['ReleaseDate']): ?>
-                        <div class="meta-item">
-                            <span class="meta-label">Data de Lançamento</span>
-                            <span class="meta-value"><?php echo date('d/m/Y', strtotime($game['ReleaseDate'])); ?></span>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <div class="meta-item">
-                            <span class="meta-label">Downloads</span>
-                            <span class="meta-value"><?php echo number_format($game['Downloads']); ?></span>
-                        </div>
-                        
-                        <div class="meta-item">
-                            <span class="meta-label">Avaliação</span>
-                            <span class="meta-value">
-                                <i class="fas fa-star" style="color: var(--gamejolt-green);"></i>
-                                <?php echo number_format($game['Rating'], 1); ?>/5.0
-                            </span>
+                        <div class="game-status status-<?php echo strtolower(str_replace(' ', '-', $game['Status'])); ?>">
+                            <?php echo htmlspecialchars($game['Status']); ?>
                         </div>
                     </div>
+                </div>
+                
+                <div class="game-info-section">
+                    <h1 class="game-title"><?php echo htmlspecialchars($game['GameTitle']); ?></h1>
                     
-                    <div class="developer-info">
-                        <div class="developer-avatar" style="background-image: url('<?php echo htmlspecialchars($game['ProfilePhoto'] ?? ''); ?>')">
+                    <div class="game-developer">
+                        <div class="dev-avatar" style="background-image: url('<?php echo htmlspecialchars(getDevAvatar($game)); ?>')">
                             <?php if(empty($game['ProfilePhoto'])): ?>
                                 <i class="fas fa-user"></i>
                             <?php endif; ?>
                         </div>
-                        <div class="developer-details">
-                            <h4><?php echo htmlspecialchars($game['CustomerName']); ?></h4>
-                            <p>@<?php echo htmlspecialchars($game['CustomerHandle']); ?></p>
-                            <?php if ($game['CustomerBio']): ?>
-                            <p style="margin-top: 5px; font-size: 0.8rem;"><?php echo htmlspecialchars($game['CustomerBio']); ?></p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="game-cover-large">
-                    <?php if (!empty($game['GameCover']) && file_exists($game['GameCover'])): ?>
-                        <img src="<?php echo htmlspecialchars($game['GameCover']); ?>" 
-                             alt="<?php echo htmlspecialchars($game['GameTitle']); ?>"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="image-fallback" style="display: none;">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                    <?php else: ?>
-                        <div class="image-fallback">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            
-            <!-- Game Details Section -->
-            <div class="game-details">
-                <h2 class="section-title">Sobre o Jogo</h2>
-                
-                <div class="game-description">
-                    <?php echo nl2br(htmlspecialchars($game['GameDescription'])); ?>
-                </div>
-                
-                <?php if ($game['Tags']): ?>
-                <div class="tags">
-                    <?php 
-                    $tags = explode(',', $game['Tags']);
-                    foreach ($tags as $tag): 
-                        $tag = trim($tag);
-                        if (!empty($tag)):
-                    ?>
-                    <span class="tag"><?php echo htmlspecialchars($tag); ?></span>
-                    <?php 
-                        endif;
-                    endforeach; 
-                    ?>
-                </div>
-                <?php endif; ?>
-                
-                <?php if ($game['SystemRequirements']): ?>
-                <div class="system-requirements">
-                    <h4><i class="fas fa-cog"></i> Requisitos do Sistema</h4>
-                    <pre><?php echo htmlspecialchars($game['SystemRequirements']); ?></pre>
-                </div>
-                <?php endif; ?>
-            </div>
-            
-            <!-- Related Games -->
-            <?php if (!empty($relatedGames)): ?>
-            <div class="related-games">
-                <h2 class="section-title">Jogos Relacionados</h2>
-                <div class="games-grid">
-                    <?php foreach ($relatedGames as $relatedGame): ?>
-                    <div class="related-game-card" onclick="window.location.href='game.php?id=<?php echo $relatedGame['GameID']; ?>'">
-                        <div class="related-game-cover">
-                            <?php if (!empty($relatedGame['GameCover']) && file_exists($relatedGame['GameCover'])): ?>
-                                <img src="<?php echo htmlspecialchars($relatedGame['GameCover']); ?>" 
-                                     alt="<?php echo htmlspecialchars($relatedGame['GameTitle']); ?>">
-                            <?php else: ?>
-                                <div class="image-fallback" style="height: 100%; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-gamepad"></i>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="related-game-info">
-                            <h3 class="related-game-title"><?php echo htmlspecialchars($relatedGame['GameTitle']); ?></h3>
-                            <div class="related-game-meta">
-                                <span><?php echo htmlspecialchars($relatedGame['Franchise']); ?></span>
-                                <span>@<?php echo htmlspecialchars($relatedGame['CustomerHandle']); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
-            
-            <!-- Comments Section -->
-            <div class="comments-section">
-                <h2 class="section-title">Comentários e Avaliações</h2>
-                
-                <?php if ($user): ?>
-                <div class="comment-form">
-                    <textarea class="comment-input" placeholder="Deixe seu comentário sobre este jogo..."></textarea>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> Enviar Comentário
-                    </button>
-                </div>
-                <?php else: ?>
-                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 30px;">
-                    <p>Faça <a href="login.php" style="color: var(--gamejolt-green);">login</a> para deixar um comentário</p>
-                </div>
-                <?php endif; ?>
-                
-                <div class="comments-list">
-                    <!-- Exemplo de comentário -->
-                    <div class="comment">
-                        <div class="comment-header">
-                            <div class="comment-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <div class="comment-author">Jogador123</div>
-                                <div class="comment-date">15/08/2023</div>
-                            </div>
-                        </div>
-                        <div class="comment-content">
-                            Jogo incrível! A história é muito envolvente e os gráficos estão ótimos. Recomendo para todos os fãs da franquia!
+                        <div class="dev-info">
+                            <span class="dev-name"><?php echo htmlspecialchars($game['CustomerName']); ?></span>
+                            <span class="dev-handle">@<?php echo htmlspecialchars($game['CustomerHandle'] ?? $game['CustomerName']); ?></span>
                         </div>
                     </div>
                     
-                    <!-- Exemplo de comentário -->
-                    <div class="comment">
-                        <div class="comment-header">
-                            <div class="comment-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <div class="comment-author">FangameLover</div>
-                                <div class="comment-date">12/08/2023</div>
-                            </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value"><?php echo number_format($game['Downloads'] ?? 0); ?></div>
+                            <div class="stat-label">Downloads</div>
                         </div>
-                        <div class="comment-content">
-                            Gostei bastante da jogabilidade, mas achei que poderia ter mais conteúdo pós-game. No geral, é um ótimo fangame!
+                        <div class="stat-item">
+                            <div class="stat-value"><?php echo number_format($game['Rating'] ?? 0, 1); ?></div>
+                            <div class="stat-label">Avaliação</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value"><?php echo $game['FileSize'] ?? 'N/A'; ?></div>
+                            <div class="stat-label">Tamanho</div>
                         </div>
                     </div>
+                    
+                    <div class="game-meta">
+                        <span class="meta-tag"><?php echo htmlspecialchars($game['Franchise'] ?? 'Franquia não especificada'); ?></span>
+                        <span class="meta-tag"><?php echo htmlspecialchars($game['Genre'] ?? 'Gênero não especificado'); ?></span>
+                        <span class="meta-tag">Lançado em: <?php echo date('d/m/Y', strtotime($game['CreatedAt'])); ?></span>
+                        <?php if (!empty($game['ReleaseDate'])): ?>
+                        <span class="meta-tag">Data de Lançamento: <?php echo date('d/m/Y', strtotime($game['ReleaseDate'])); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="download-section">
+    <?php if ($user): ?>
+        <?php if (!empty($game['DownloadLink']) || !empty($game['GameFile'])): ?>
+            <a href="download.php?id=<?php echo $gameId; ?>" class="download-btn" onclick="trackDownload(<?php echo $gameId; ?>)">
+                <i class="fas fa-download"></i>
+                Baixar Fangame
+            </a>
+            <?php if (!empty($game['FileSize'])): ?>
+                <div style="margin-top: 10px; color: var(--gray); font-size: 0.9rem;">
+                    <i class="fas fa-hdd"></i> Tamanho: <?php echo htmlspecialchars($game['FileSize']); ?>
+                </div>
+            <?php endif; ?>
+        <?php else: ?>
+            <button class="download-btn disabled" disabled>
+                <i class="fas fa-download"></i>
+                Download Indisponível
+            </button>
+            <div style="margin-top: 10px; color: var(--warning); font-size: 0.9rem;">
+                <i class="fas fa-exclamation-triangle"></i> Este fangame ainda não possui arquivo para download.
+            </div>
+        <?php endif; ?>
+    <?php else: ?>
+        <div class="login-prompt">
+            <p>Faça login para baixar este fangame</p>
+            <a href="login.php" class="download-btn" style="text-decoration: none; margin-top: 10px; display: inline-block;">
+                <i class="fas fa-sign-in-alt"></i>
+                Fazer Login
+            </a>
+        </div>
+    <?php endif; ?>
+</div>
+                </div>
+            </div>
+            
+            <!-- Game Content -->
+            <div class="game-content">
+                <div class="game-main">
+                    <!-- Description -->
+                    <div class="game-description-section">
+                        <h3 class="section-title">Descrição</h3>
+                        <div class="game-description">
+                            <?php 
+                            $description = $game['GameDescription'] ?? 'Este fangame ainda não possui uma descrição.';
+                            echo nl2br(htmlspecialchars($description)); 
+                            ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Screenshots -->
+                    <?php if (!empty($screenshots)): ?>
+                    <div class="screenshots-section">
+                        <h3 class="section-title">Screenshots</h3>
+                        <div class="screenshots-grid">
+                            <?php foreach ($screenshots as $screenshot): ?>
+                            <div class="screenshot-item">
+                                <img src="<?php echo htmlspecialchars($screenshot); ?>" alt="Screenshot do jogo">
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <!-- System Requirements -->
+                    <?php if (!empty($game['SystemRequirements'])): ?>
+                    <div class="requirements-section">
+                        <h3 class="section-title">Requisitos do Sistema</h3>
+                        <div class="requirements-grid">
+                            <div class="requirements-column">
+                                <h4>Mínimos</h4>
+                                <div class="requirement-item">
+                                    <div class="requirement-value">
+                                        <?php echo nl2br(htmlspecialchars($game['SystemRequirements'])); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="game-sidebar">
+                    <!-- Game Info -->
+                    <div class="info-card">
+                        <h3 class="section-title">Informações</h3>
+                        <ul class="info-list">
+                            <li class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value"><?php echo htmlspecialchars($game['Status']); ?></span>
+                            </li>
+                            <li class="info-item">
+                                <span class="info-label">Desenvolvedor</span>
+                                <span class="info-value"><?php echo htmlspecialchars($game['CustomerName']); ?></span>
+                            </li>
+                            <li class="info-item">
+                                <span class="info-label">Franquia</span>
+                                <span class="info-value"><?php echo htmlspecialchars($game['Franchise'] ?? 'N/A'); ?></span>
+                            </li>
+                            <li class="info-item">
+                                <span class="info-label">Gênero</span>
+                                <span class="info-value"><?php echo htmlspecialchars($game['Genre'] ?? 'N/A'); ?></span>
+                            </li>
+                            <li class="info-item">
+                                <span class="info-label">Tamanho</span>
+                                <span class="info-value"><?php echo htmlspecialchars($game['FileSize'] ?? 'N/A'); ?></span>
+                            </li>
+                            <li class="info-item">
+                                <span class="info-label">Data de Publicação</span>
+                                <span class="info-value"><?php echo date('d/m/Y', strtotime($game['CreatedAt'])); ?></span>
+                            </li>
+                            <?php if (!empty($game['ReleaseDate'])): ?>
+                            <li class="info-item">
+                                <span class="info-label">Data de Lançamento</span>
+                                <span class="info-value"><?php echo date('d/m/Y', strtotime($game['ReleaseDate'])); ?></span>
+                            </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    
+                    <!-- Tags -->
+                    <?php if (!empty($game['Tags'])): ?>
+                    <div class="tags-section">
+                        <h3 class="section-title">Tags</h3>
+                        <div class="tags-container">
+                            <?php 
+                            $tags = explode(',', $game['Tags']);
+                            foreach ($tags as $tag): 
+                                $tag = trim($tag);
+                                if (!empty($tag)):
+                            ?>
+                                <span class="tag"><?php echo htmlspecialchars($tag); ?></span>
+                            <?php 
+                                endif;
+                            endforeach; 
+                            ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <!-- Developer Actions -->
+                    <?php if ($isDeveloper): ?>
+                    <div class="developer-actions">
+                        <h3 class="section-title">Ações do Desenvolvedor</h3>
+                        <div class="action-buttons">
+                            <a href="edit_fangame.php?id=<?php echo $gameId; ?>" class="action-btn edit">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="delete_fangame.php?id=<?php echo $gameId; ?>" class="action-btn delete" onclick="return confirm('Tem certeza que deseja excluir este fangame?')">
+                                <i class="fas fa-trash"></i> Excluir
+                            </a>
+                            <a href="stats_fangame.php?id=<?php echo $gameId; ?>" class="action-btn">
+                                <i class="fas fa-chart-bar"></i> Estatísticas
+                            </a>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Efeitos interativos
+        // User dropdown functionality
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Fechar dropdown ao clicar fora
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+            
+            // Prevenir fechamento ao clicar no dropdown
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+        
+        // Image error handling
         document.addEventListener('DOMContentLoaded', function() {
-            // Efeito de hover nos cards de jogos relacionados
-            document.querySelectorAll('.related-game-card').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-            
-            // Sistema de avaliação por estrelas (simplificado)
-            const ratingButtons = document.querySelectorAll('.btn-secondary');
-            ratingButtons.forEach(btn => {
-                if (btn.textContent.includes('Avaliar')) {
-                    btn.addEventListener('click', function() {
-                        const rating = prompt('De 1 a 5, qual sua avaliação para este jogo?');
-                        if (rating && rating >= 1 && rating <= 5) {
-                            alert(`Obrigado por avaliar com ${rating} estrelas!`);
-                        }
-                    });
-                }
-            });
-            
-            // Sistema de compartilhamento
-            document.querySelectorAll('.btn-secondary').forEach(btn => {
-                if (btn.textContent.includes('Compartilhar')) {
-                    btn.addEventListener('click', function() {
-                        if (navigator.share) {
-                            navigator.share({
-                                title: '<?php echo htmlspecialchars($game['GameTitle']); ?>',
-                                text: 'Confira este incrível fangame!',
-                                url: window.location.href
-                            });
-                        } else {
-                            // Fallback para copiar link
-                            navigator.clipboard.writeText(window.location.href).then(() => {
-                                alert('Link copiado para a área de transferência!');
-                            });
-                        }
-                    });
-                }
-            });
-            
-            // Verificar se as imagens carregam corretamente
-            document.querySelectorAll('img').forEach(img => {
+            document.querySelectorAll('.game-cover img').forEach(img => {
                 img.addEventListener('error', function() {
+                    this.style.display = 'none';
                     const fallback = this.nextElementSibling;
-                    if (fallback && fallback.classList.contains('image-fallback')) {
-                        this.style.display = 'none';
+                    if (fallback && fallback.classList.contains('game-cover-fallback')) {
                         fallback.style.display = 'flex';
                     }
                 });
+            });
+            
+            // Screenshot click to enlarge (basic implementation)
+            document.querySelectorAll('.screenshot-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const imgSrc = this.querySelector('img').src;
+                    // Aqui você pode implementar um lightbox/modal
+                    window.open(imgSrc, '_blank');
+                });
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             });
         });
     </script>
