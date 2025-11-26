@@ -984,9 +984,6 @@ $screenshots = getGameScreenshots($pdo, $gameId);
                             <a href="delete_fangame.php?id=<?php echo $gameId; ?>" class="action-btn delete" onclick="return confirm('Tem certeza que deseja excluir este fangame?')">
                                 <i class="fas fa-trash"></i> Excluir
                             </a>
-                            <a href="stats_fangame.php?id=<?php echo $gameId; ?>" class="action-btn">
-                                <i class="fas fa-chart-bar"></i> Estatísticas
-                            </a>
                         </div>
                     </div>
                     <?php endif; ?>
