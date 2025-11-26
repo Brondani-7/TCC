@@ -330,6 +330,25 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .header-icon:hover {
             background-color: var(--primary);
         }
+        
+        .search-btn {
+            padding: 12px 25px;
+            background: var(--gamejolt-green);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-btn:hover {
+            background: #5ab869;
+            transform: translateY(-2px);
+        }
     
         /* Profile Header */
         .profile-header {
@@ -873,7 +892,7 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                     <?php else: ?>
-                    <a href="login.php" class="new-topic-btn">
+                    <a href="login.php" class="search-btn" style="text-decoration: none;">
                         <i class="fas fa-sign-in-alt"></i>
                         Fazer Login
                     </a>
