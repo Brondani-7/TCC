@@ -40,10 +40,18 @@ $pdo->beginTransaction();
 
 try {
     // 1. Deletar screenshots do jogo
-    $screenshots = getGameScreenshots($pdo, $gameId);
-    foreach ($screenshots as $screenshotPath) {
-        if (file_exists($screenshotPath)) {
-            unlink($screenshotPath);
+    $stmt = $pdo->prepare("
+        SELECT ScreenshotID, ScreenshotPath 
+        FROM game_screenshots 
+        WHERE GameID = ?
+    ");
+    $stmt->execute([$gameId]);
+    $screenshots = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($screenshots as $screenshot) {
+        // Remover arquivo físico
+        if (!empty($screenshot['ScreenshotPath']) && file_exists($screenshot['ScreenshotPath'])) {
+            unlink($screenshot['ScreenshotPath']);
         }
     }
     

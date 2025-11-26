@@ -981,9 +981,12 @@ $screenshots = getGameScreenshots($pdo, $gameId);
                             <a href="edit_fangame.php?id=<?php echo $gameId; ?>" class="action-btn edit">
                                 <i class="fas fa-edit"></i> Editar
                             </a>
-                            <a href="delete_fangame.php?id=<?php echo $gameId; ?>" class="action-btn delete" onclick="return confirm('Tem certeza que deseja excluir este fangame?')">
-                                <i class="fas fa-trash"></i> Excluir
-                            </a>
+                            <form method="POST" action="delete_fangame.php" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este fangame? Esta ação não pode ser desfeita.');">
+                                <input type="hidden" name="game_id" value="<?php echo $gameId; ?>">
+                                <button type="submit" class="action-btn delete">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <?php endif; ?>

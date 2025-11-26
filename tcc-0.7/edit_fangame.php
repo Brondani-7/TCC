@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Processar remoção de screenshots
     if (isset($_POST['delete_screenshot'])) {
         $screenshotId = intval($_POST['screenshot_id']);
-        if (removeGameScreenshot($pdo, $screenshotId, $gameId)) {
+        if (deleteGameScreenshot($pdo, $screenshotId)) {
             $message = 'Screenshot removida com sucesso!';
             $messageType = 'success';
             $screenshots = getGameScreenshots($pdo, $gameId);

@@ -468,6 +468,42 @@ function getDevAvatar($user) {
     return null;
 }
 
+// Função para atualizar fangame
+function updateFangame($pdo, $gameId, $updateData) {
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE fangames SET 
+                GameTitle = ?, 
+                GameDescription = ?, 
+                Franchise = ?, 
+                Genre = ?, 
+                Status = ?, 
+                Tags = ?, 
+                DownloadLink = ?, 
+                SystemRequirements = ?, 
+                ReleaseDate = ?,
+                UpdatedAt = NOW()
+            WHERE GameID = ?
+        ");
+        
+        return $stmt->execute([
+            $updateData['GameTitle'],
+            $updateData['GameDescription'],
+            $updateData['Franchise'],
+            $updateData['Genre'],
+            $updateData['Status'],
+            $updateData['Tags'],
+            $updateData['DownloadLink'],
+            $updateData['SystemRequirements'],
+            $updateData['ReleaseDate'],
+            $gameId
+        ]);
+    } catch (Exception $e) {
+        error_log("Erro em updateFangame: " . $e->getMessage());
+        return false;
+    }
+}
+
 // Função para fazer logout
 function logout() {
     session_destroy();
