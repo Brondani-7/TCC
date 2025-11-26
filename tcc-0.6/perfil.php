@@ -1005,18 +1005,6 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 <?php endif; ?>
             </div>
-            
-            <!-- Recent Activity Section -->
-            <div class="content-section">
-                <h2 class="section-title">
-                    <i class="fas fa-clock"></i>
-                    Atividade Recente
-                </h2>
-                <div style="text-align: center; padding: 30px; color: var(--gray);">
-                    <i class="fas fa-history" style="font-size: 2.5rem; margin-bottom: 15px; opacity: 0.5;"></i>
-                    <p>Nenhuma atividade recente para exibir.</p>
-                </div>
-            </div>
         </div>
     </div>
 
