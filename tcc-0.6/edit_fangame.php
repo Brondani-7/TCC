@@ -25,8 +25,8 @@ if (!$game || !isGameDeveloper($pdo, $gameId, $user['CustomerID'])) {
     exit;
 }
 
-// Buscar screenshots existentes
-$screenshots = getGameScreenshots($pdo, $gameId);
+// Buscar screenshots existentes (com IDs para permitir deleção)
+$screenshots = getGameScreenshots($pdo, $gameId, true);
 
 // Processar formulário de atualização
 $message = '';
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($uploadedCount > 0) {
             $message .= ($message ? '<br>' : '') . $uploadedCount . ' screenshot(s) adicionada(s) com sucesso!';
             $messageType = $messageType ?: 'success';
-            $screenshots = getGameScreenshots($pdo, $gameId);
+            $screenshots = getGameScreenshots($pdo, $gameId, true);
         }
     }
     
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (removeGameScreenshot($pdo, $screenshotId, $gameId)) {
             $message = 'Screenshot removida com sucesso!';
             $messageType = 'success';
-            $screenshots = getGameScreenshots($pdo, $gameId);
+            $screenshots = getGameScreenshots($pdo, $gameId, true);
         } else {
             $message = 'Erro ao remover screenshot.';
             $messageType = 'error';
