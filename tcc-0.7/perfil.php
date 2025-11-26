@@ -983,10 +983,6 @@ $userGames = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="fas fa-download"></i>
                                             <?= number_format($game['Downloads']) ?>
                                         </div>
-                                        <div class="game-stat">
-                                            <i class="fas fa-star"></i>
-                                            <?= number_format($game['Rating'], 1) ?>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="game-tags">

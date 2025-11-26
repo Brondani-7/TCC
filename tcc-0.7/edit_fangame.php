@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'Status' => $_POST['status'],
             'Tags' => $_POST['tags'],
             'DownloadLink' => $_POST['download_link'],
-            'FileSize' => $_POST['file_size'],
             'SystemRequirements' => $_POST['system_requirements'],
             'ReleaseDate' => $_POST['release_date']
         ];
@@ -55,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $messageType = 'success';
                 // Atualizar dados locais
                 $game = getFangame($pdo, $gameId);
+                // Redirecionar após 2 segundos
+                echo "<script>setTimeout(() => window.location.href = 'game.php?id={$gameId}', 2000);</script>";
             } else {
                 $message = 'Erro ao atualizar fangame.';
                 $messageType = 'error';
@@ -71,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Status = ?, 
                         Tags = ?, 
                         DownloadLink = ?, 
-                        FileSize = ?, 
                         SystemRequirements = ?, 
                         ReleaseDate = ?,
                         UpdatedAt = NOW()
@@ -86,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $updateData['Status'],
                     $updateData['Tags'],
                     $updateData['DownloadLink'],
-                    $updateData['FileSize'],
                     $updateData['SystemRequirements'],
                     $updateData['ReleaseDate'],
                     $gameId
@@ -96,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message = 'Fangame atualizado com sucesso!';
                     $messageType = 'success';
                     $game = getFangame($pdo, $gameId);
+                    // Redirecionar após 2 segundos
+                    echo "<script>setTimeout(() => window.location.href = 'game.php?id={$gameId}', 2000);</script>";
                 } else {
                     $message = 'Erro ao atualizar fangame.';
                     $messageType = 'error';
@@ -651,13 +652,6 @@ $screenshotData = getScreenshotData($pdo, $gameId);
                         <label class="form-label" for="download_link">Link de Download</label>
                         <input type="url" id="download_link" name="download_link" class="form-control" 
                                value="<?php echo htmlspecialchars($game['DownloadLink'] ?? ''); ?>">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="file_size">Tamanho do Arquivo</label>
-                        <input type="text" id="file_size" name="file_size" class="form-control" 
-                               value="<?php echo htmlspecialchars($game['FileSize'] ?? ''); ?>">
-                        <div class="form-help">Ex: 150 MB, 2.5 GB</div>
                     </div>
                     
                     <div class="form-group">

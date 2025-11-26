@@ -311,17 +311,66 @@ function incrementDownloads($pdo, $gameId) {
 function getGameScreenshots($pdo, $gameId) {
     try {
         $stmt = $pdo->prepare("
-            SELECT ScreenshotPath 
+            SELECT ScreenshotID, ScreenshotPath, ScreenshotOrder, CreatedAt
             FROM game_screenshots 
             WHERE GameID = ? 
-            ORDER BY ScreenshotOrder, CreatedAt ASC
+            ORDER BY ScreenshotOrder ASC, CreatedAt ASC
         ");
         $stmt->execute([$gameId]);
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $screenshots = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Retornar apenas os caminhos para compatibilidade
+        return array_column($screenshots, 'ScreenshotPath');
     } catch (Exception $e) {
         error_log("Erro ao buscar screenshots: " . $e->getMessage());
         return [];
     }
+}
+
+// Função para adicionar screenshot de um jogo
+function addGameScreenshot($pdo, $gameId, $screenshotPath) {
+    try {
+        // Obter o próximo número de ordem
+        $stmt = $pdo->prepare("SELECT COALESCE(MAX(ScreenshotOrder), 0) + 1 FROM game_screenshots WHERE GameID = ?");
+        $stmt->execute([$gameId]);
+        $nextOrder = $stmt->fetchColumn();
+        
+        // Inserir screenshot
+        $stmt = $pdo->prepare("
+            INSERT INTO game_screenshots (GameID, ScreenshotPath, ScreenshotOrder) 
+            VALUES (?, ?, ?)
+        ");
+        return $stmt->execute([$gameId, $screenshotPath, $nextOrder]);
+    } catch (Exception $e) {
+        error_log("Erro ao adicionar screenshot: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Função para deletar screenshot de um jogo
+function deleteGameScreenshot($pdo, $screenshotId) {
+    try {
+        // Buscar o caminho da screenshot antes de deletar
+        $stmt = $pdo->prepare("SELECT ScreenshotPath FROM game_screenshots WHERE ScreenshotID = ?");
+        $stmt->execute([$screenshotId]);
+        $screenshot = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($screenshot && file_exists($screenshot['ScreenshotPath'])) {
+            unlink($screenshot['ScreenshotPath']);
+        }
+        
+        // Deletar do banco de dados
+        $stmt = $pdo->prepare("DELETE FROM game_screenshots WHERE ScreenshotID = ?");
+        return $stmt->execute([$screenshotId]);
+    } catch (Exception $e) {
+        error_log("Erro ao deletar screenshot: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Alias da função deleteGameScreenshot para compatibilidade
+function removeGameScreenshot($pdo, $screenshotId, $gameId = null) {
+    return deleteGameScreenshot($pdo, $screenshotId);
 }
 
 // Função para obter todos os fangames

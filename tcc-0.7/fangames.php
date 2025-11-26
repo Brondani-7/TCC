@@ -713,6 +713,10 @@ $totalPages = ceil($totalFangames / $limit);
                 <div class="page-title">Descobrir Fangames</div>
                 <div class="header-actions">
                     <?php if ($user): ?>
+                    <a href="add_fangame.php" class="search-btn" style="text-decoration: none; margin-right: 10px;">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Fangame
+                    </a>
                     <div class="user-avatar-container">
                         <div class="user-avatar" id="userAvatar" style="background-image: url('<?php echo htmlspecialchars($user['ProfilePhoto'] ?? ''); ?>')">
                             <?php if(empty($user['ProfilePhoto'])): ?>
@@ -873,10 +877,6 @@ $totalPages = ceil($totalFangames / $limit);
                                     <div class="game-stat">
                                         <i class="fas fa-download"></i>
                                         <span><?php echo number_format($game['Downloads'] ?? 0); ?> downloads</span>
-                                    </div>
-                                    <div class="game-stat">
-                                        <i class="fas fa-star"></i>
-                                        <span><?php echo number_format($game['Rating'] ?? 0, 1); ?></span>
                                     </div>
                                     <div class="game-stat">
                                         <i class="fas fa-calendar"></i>

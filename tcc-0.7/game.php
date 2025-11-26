@@ -365,8 +365,8 @@ $screenshots = getGameScreenshots($pdo, $gameId);
         }
         
         .game-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            justify-content: center;
             gap: 20px;
             margin-bottom: 30px;
             padding: 20px;
@@ -828,14 +828,6 @@ $screenshots = getGameScreenshots($pdo, $gameId);
                             <div class="stat-value"><?php echo number_format($game['Downloads'] ?? 0); ?></div>
                             <div class="stat-label">Downloads</div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value"><?php echo number_format($game['Rating'] ?? 0, 1); ?></div>
-                            <div class="stat-label">Avaliação</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value"><?php echo $game['FileSize'] ?? 'N/A'; ?></div>
-                            <div class="stat-label">Tamanho</div>
-                        </div>
                     </div>
                     
                     <div class="game-meta">
@@ -854,11 +846,6 @@ $screenshots = getGameScreenshots($pdo, $gameId);
                 <i class="fas fa-download"></i>
                 Baixar Fangame
             </a>
-            <?php if (!empty($game['FileSize'])): ?>
-                <div style="margin-top: 10px; color: var(--gray); font-size: 0.9rem;">
-                    <i class="fas fa-hdd"></i> Tamanho: <?php echo htmlspecialchars($game['FileSize']); ?>
-                </div>
-            <?php endif; ?>
         <?php else: ?>
             <button class="download-btn disabled" disabled>
                 <i class="fas fa-download"></i>
@@ -902,11 +889,15 @@ $screenshots = getGameScreenshots($pdo, $gameId);
                         <div class="screenshots-grid">
                             <?php foreach ($screenshots as $screenshot): ?>
                             <div class="screenshot-item">
-                                <img src="<?php echo htmlspecialchars($screenshot); ?>" alt="Screenshot do jogo">
+                                <img src="<?php echo htmlspecialchars($screenshot); ?>" 
+                                     alt="Screenshot do jogo"
+                                     onerror="console.error('Erro ao carregar:', '<?php echo htmlspecialchars($screenshot); ?>')">
                             </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
+                    <?php else: ?>
+                    <!-- Debug: Nenhuma screenshot encontrada -->
                     <?php endif; ?>
                     
                     <!-- System Requirements -->
@@ -948,10 +939,6 @@ $screenshots = getGameScreenshots($pdo, $gameId);
                             <li class="info-item">
                                 <span class="info-label">Gênero</span>
                                 <span class="info-value"><?php echo htmlspecialchars($game['Genre'] ?? 'N/A'); ?></span>
-                            </li>
-                            <li class="info-item">
-                                <span class="info-label">Tamanho</span>
-                                <span class="info-value"><?php echo htmlspecialchars($game['FileSize'] ?? 'N/A'); ?></span>
                             </li>
                             <li class="info-item">
                                 <span class="info-label">Data de Publicação</span>

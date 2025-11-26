@@ -11,6 +11,7 @@ if (!isLoggedIn()) {
 $user = getCurrentUser($pdo);
 $message = '';
 $error = '';
+$success = '';
 
 // Criar diretórios de upload
 createUploadDirs();
@@ -99,12 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "INSERT INTO fangames ($columnList) VALUES ($placeholders)";
             
             $stmt = $pdo->prepare($sql);
-            $success = $stmt->execute($values);
+            $result = $stmt->execute($values);
             
-            if ($success) {
-                $message = "Fangame cadastrado com sucesso!";
+            if ($result) {
+                $success = "Fangame cadastrado com sucesso!";
                 // Redirecionar após 2 segundos
-                echo "<script>setTimeout(() => window.location.href = 'index.php', 2000);</script>";
+                echo "<script>setTimeout(() => window.location.href = 'fangames.php', 2000);</script>";
             } else {
                 $error = "Erro ao cadastrar fangame no banco de dados.";
             }

@@ -1206,7 +1206,6 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
                                     <div class="result-meta">
                                         <span><i class="fas fa-user"></i> @<?php echo htmlspecialchars($game['CustomerHandle']); ?></span>
                                         <span><i class="fas fa-tag"></i> <?php echo htmlspecialchars($game['Genre'] ?? 'N/A'); ?></span>
-                                        <span><i class="fas fa-star"></i> <?php echo number_format($game['Rating'] ?? 0, 1); ?></span>
                                     </div>
                                     <?php if (!empty($game['GameDescription'])): ?>
                                     <div class="result-description">
@@ -1294,36 +1293,6 @@ $enableSidebar = !$isMobile; // Sidebar sempre visível apenas em desktop
             </div>
             <?php endif; ?>
 
-            <!-- Categories Section -->
-            <?php if (!empty($categories)): ?>
-            <div class="section">
-                <h2 class="section-title">
-                    <i class="fas fa-th-large"></i>
-                    Categorias do Fórum
-                </h2>
-                <div class="categories-grid">
-                    <?php foreach ($categories as $category): ?>
-                    <a href="category.php?id=<?php echo $category['CategoryID']; ?>" class="category-card">
-                        <div class="category-icon">
-                            <i class="fas fa-folder"></i>
-                        </div>
-                        <h3 class="category-title"><?php echo htmlspecialchars($category['CategoryName']); ?></h3>
-                        <p class="category-description"><?php echo htmlspecialchars($category['CategoryDescription'] ?? 'Discussões sobre ' . $category['CategoryName']); ?></p>
-                        <div class="category-stats">
-                            <div class="topic-stat">
-                                <i class="fas fa-comments"></i>
-                                <span><?php echo $category['topic_count'] ?? 0; ?> tópicos</span>
-                            </div>
-                            <div class="topic-stat">
-                                <i class="fas fa-comment"></i>
-                                <span><?php echo $category['post_count'] ?? 0; ?> posts</span>
-                            </div>
-                        </div>
-                    </a>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
