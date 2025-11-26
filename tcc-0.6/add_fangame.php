@@ -11,6 +11,7 @@ if (!isLoggedIn()) {
 $user = getCurrentUser($pdo);
 $message = '';
 $error = '';
+$success = '';
 
 // Criar diretórios de upload
 createUploadDirs();
